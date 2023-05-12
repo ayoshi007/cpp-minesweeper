@@ -4,3 +4,7 @@ project(
     LANGUAGES CXX
     VERSION 1.0.0
 )
+add_executable(
+    cpp-ms
+    main.cpp
+)
