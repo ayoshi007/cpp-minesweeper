@@ -1,8 +1,6 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
-int usingFTXUI();
-
 class Board {
     private:
         const int width;
