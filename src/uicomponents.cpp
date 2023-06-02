@@ -22,36 +22,42 @@ using namespace ftxui;
 
 // all variables are declared static to prevent external linkage
 namespace GameUI {
-    void setWindowBar();
-    void setContentMainMenu();
-    void setContentBoard(int width, int height, int mineCount);
-    void setWindowRenderer();
-    void setMainMenu();
-    void setBoard(int width, int height, int mineCount);
-    void changeMenuSubtitle(const std::string& subtitle);
-    void startScreenLoop();
-
     /* functors and variables */
     static bool quitModalShown = false;
     static bool customBoardModalShown = false;
-    static std::string topBarSubtitle {};
     static int boardWidth {constants::DEFAULT_CUSTOM_W};
     static int boardHeight {constants::DEFAULT_CUSTOM_H};
     static int minePercent {constants::DEFAULT_CUSTOM_PERCENT};
+    static int boardMineCount {constants::SMALL_BOARD_MINES};
+
+    static int shownScreen {0};
     
     static auto showQuitModal = [] { quitModalShown = true; };
     static auto hideQuitModal = [] { quitModalShown = false; };
     static auto showCustomBoardModal = [] { customBoardModalShown = true; };
     static auto hideCustomBoardModal = [] { customBoardModalShown = false; };
+    
+    static auto showMainMenu = [] { shownScreen = 0; };
+    static auto showBoard  = [] { shownScreen = 1; };
+
+    /* FTXUI elements and components that do not change */
+    static ScreenInteractive screen = ScreenInteractive::TerminalOutput();
+    static auto exitGame = screen.ExitLoopClosure();
+    static auto sliderLabel = [] (std::string labelText, int value) {
+        return text(labelText + std::to_string(value));
+    };
     static auto createSmallBoard = [] {
-        setBoard(constants::SMALL_BOARD_W, constants::SMALL_BOARD_H, constants::SMALL_BOARD_MINES);
-        };
+        boardMineCount = constants::SMALL_BOARD_MINES;
+        showBoard();
+    };
     static auto createMedBoard = [] {
-        setBoard(constants::MED_BOARD_W, constants::MED_BOARD_H, constants::MED_BOARD_MINES);
-        };
+        boardMineCount = constants::MED_BOARD_MINES;
+        showBoard();
+    };
     static auto createLargeBoard = [] {
-        setBoard(constants::LARGE_BOARD_W, constants::LARGE_BOARD_H, constants::LARGE_BOARD_MINES);
-        };
+        boardMineCount = constants::LARGE_BOARD_MINES;
+        showBoard();
+    };
     static auto createCustomBoard = [] {
         int mineCount = boardWidth * boardHeight * minePercent / 100;
         if (mineCount == 0) {
@@ -59,161 +65,167 @@ namespace GameUI {
         } else if (mineCount == boardWidth * boardHeight) {
             mineCount -= 2;
         }
-        setBoard(boardWidth, boardHeight, mineCount);
-        };
-    
-    // for custom board modal component
-    static Component widthSlider = Slider("", &boardWidth, 4, 50, 1);
-    static Component heightSlider = Slider("", &boardHeight, 4, 50, 1);
-    static Component mineSlider = Slider("", &minePercent, 1, 99, 1);
-    Element sliderLabel(std::string labelText, int value) {
-        return text(labelText + std::to_string(value));
-    }
-    static Component customBoardStart = Button("Start", createCustomBoard, ButtonOption::Animated());
-    static Component customBoardQuit = Button("Back", hideCustomBoardModal, ButtonOption::Animated());
-
-    /* FTXUI elements and components that do not change */
-    static auto screen = ScreenInteractive::TerminalOutput();
-    static auto exitGame = screen.ExitLoopClosure();
-
-    // Modal component for exiting game
-    static Component quitModalComponent = Container::Vertical({
-            Button("Yes", exitGame, ButtonOption::Animated()),
-            Button("No", hideQuitModal, ButtonOption::Animated()),
+        boardMineCount = mineCount;
+        showBoard();
+    };
+    class ComponentRendererFactory {
+        public:
+        static Component makeYesNoModal(const std::string& prompt, std::function<void()> yesOp, std::function<void()> noOp) {
+            return Container::Vertical({
+                Button("Yes", yesOp, ButtonOption::Animated()),
+                Button("No", noOp, ButtonOption::Animated())
+            })
+            | Renderer([prompt](Element buttons) {
+                return vbox({
+                    text(prompt),
+                    separator(),
+                    buttons
+                })
+                | border | bgcolor(Color::Black);
+            });
+        }
+        static Component makeWindowBarRenderer(const std::string& subtitle, Component quitButton) {
+            return quitButton
+                | Renderer([subtitle](Element button) {
+                    return hbox({
+                        text("Terminal Minesweeper") | center,
+                        separator(),
+                        text(subtitle) | flex,
+                        button
+                });
+            });
+        }
+        static Component makeWindowRenderer(Component windowBar, Component content) {
+            C
+        }
+    };
+    static auto constructPromptOptionModal = [] (const std::string& prompt, std::function<void()> yesOp, std::function<void()> noOp) {
+        return Container::Vertical({
+            Button("Yes", yesOp, ButtonOption::Animated()),
+            Button("No", noOp, ButtonOption::Animated())
         })
-        | Renderer([](Element buttons) {
+        | Renderer([prompt](Element buttons) {
             return vbox({
-                text("Quit game?"),
+                text(prompt),
                 separator(),
                 buttons
             })
-            | border | bgcolor(Color::Black);;
+            | border | bgcolor(Color::Black);
         });
-    
-    static Component customBoardModalComponent = Container::Vertical({
-        widthSlider,
-        heightSlider,
-        mineSlider,
-        customBoardStart,
-        customBoardQuit
-    })
-    | Renderer([](Element components) {
-        return vbox({
-            text("Create custom board"),
-            separator(),
-            gridbox({
-                {sliderLabel("Width: ", boardWidth), widthSlider->Render()},
-                {sliderLabel("Height: ", boardHeight), heightSlider->Render()},
-                {sliderLabel("Mine %: ", minePercent), mineSlider->Render()}
-            }) | xflex,
-            separator(),
-            customBoardStart->Render(),
-            customBoardQuit->Render()
-        })
-        | border | bgcolor(Color::Black) | size(WIDTH, GREATER_THAN, screen.dimx() / 5);
-    });
-
-    // board buttons
-    Component smallBoardButton = Button("Small (8x8, 10 mines)", createSmallBoard, ButtonOption::Animated());
-    Component medBoardButton = Button("Medium (16x16, 40 mines)", createMedBoard, ButtonOption::Animated());
-    Component largeBoardButton = Button("Large (30x16, 99 mines)", createLargeBoard, ButtonOption::Animated());
-    Component customBoardButton = Button("Custom board", showCustomBoardModal, ButtonOption::Animated());
-    // main menu component container
-    static Component mainMenuButtons = Container::Vertical({
-        Container::Horizontal({
-            smallBoardButton,
-            medBoardButton
-        }),
-        Container::Horizontal({
-            largeBoardButton,
-            customBoardButton
-        })
-    })
-    | Renderer([](Element buttons) {
-        return gridbox({
-            {smallBoardButton->Render(), medBoardButton->Render()},
-            {largeBoardButton->Render(), customBoardButton->Render()}
-        }) | center | bgcolor(Color::Black);
-    });
-
-    // custom board modal menu
-        // create 3 sliders that edit global integers, and a horizontal container with 2 buttons
-    
-    // start new game modal menu
-
-    // return to menu modal menu
-
-    /* FTXUI elements and components that do change */
-    
-    static Component windowBar {};
-    static Component content {};
-    static Component windowRenderer {};
-    
-    /* helper functions that edit the UI components that change throughout program execution */
-    // window bar generator
-    void setWindowBar() {
-        windowBar = Button("Quit", showQuitModal, ButtonOption::Ascii())
-            | Renderer([](Element button) {
-                Element title = text("Terminal Minesweeper") | center;
+    };
+    static auto constructWindowBar = [] (const std::string& subtitle) {
+        return Button("Quit", showQuitModal, ButtonOption::Ascii())
+            | Renderer([subtitle](Element button) {
                 return hbox({
-                    title,
+                    text("Terminal Minesweeper") | center,
                     separator(),
-                    text(topBarSubtitle) | flex,
+                    text(subtitle) | flex,
                     button
                 });
         });
-    }
-    // sets content component to main menu buttons
-    void setContentMainMenu() {
-        content = mainMenuButtons;
-        content |= Modal(customBoardModalComponent, &customBoardModalShown);
-    }
-    void setContentBoard(int width, int height, int mineCount) {
-        // create board
-        std::cout << width << 'x' << height << ", " << mineCount << "mines\n";
-        content = Button("placeholder", [](){}, ButtonOption::Animated());
-    }
-    // window generator
-    void setWindowRenderer() {
-        windowRenderer = Container::Vertical({
-            windowBar,
+    };
+    static auto constructWindowRenderer = [] (const std::string& subtitle, Component& content) {
+        static Component window = Container::Vertical({
+            constructWindowBar(subtitle),
             content
         });
-        windowRenderer |= Renderer([](Element window) {
+        static Component windowRenderer = Renderer(window, []() {
             return vbox({
-                windowBar->Render(),
-                separator(),
-                content->Render()
+                window->ChildAt(0)->Render(),
+                separator(),    
+                window->ChildAt(1)->Render()
             }) | border;
         });
-        windowRenderer |= Modal(quitModalComponent, &quitModalShown);
+        windowRenderer |= Modal(constructPromptOptionModal("Quit game?", exitGame, hideQuitModal), &quitModalShown);
         windowRenderer |= bgcolor(Color::Black);
-    }
-    // game board generator
+        return windowRenderer;
+    };
+    Component constructMainMenu() {
+        // modal component for custom board creation
+        static Component widthSlider = Slider("", &boardWidth, 4, 50, 1);
+        static Component heightSlider = Slider("", &boardHeight, 4, 50, 1);
+        static Component mineSlider = Slider("", &minePercent, 1, 99, 1);
+        static Component customBoardStart = Button("Start", createCustomBoard, ButtonOption::Animated());
+        static Component customBoardQuit = Button("Back", hideCustomBoardModal, ButtonOption::Animated());
+        static Component customBoardModalComponent = Container::Vertical({
+            widthSlider,
+            heightSlider,
+            mineSlider,
+            customBoardStart,
+            customBoardQuit
+        })
+        | Renderer([](Element components) {
+            return vbox({
+                text("Create custom board"),
+                separator(),
+                gridbox({
+                    {sliderLabel("Width: ", boardWidth), widthSlider->Render()},
+                    {sliderLabel("Height: ", boardHeight), heightSlider->Render()},
+                    {sliderLabel("Mine %: ", minePercent), mineSlider->Render()}
+                }) | xflex,
+                separator(),
+                customBoardStart->Render(),
+                customBoardQuit->Render()
+            })
+            | border | bgcolor(Color::Black) | size(WIDTH, GREATER_THAN, screen.dimx() / 5);
+        });
 
+        // main menu buttons
+        static Component smallBoardButton = Button("Small (8x8, 10 mines)", createSmallBoard, ButtonOption::Animated());
+        static Component medBoardButton = Button("Medium (16x16, 40 mines)", createMedBoard, ButtonOption::Animated());
+        static Component largeBoardButton = Button("Large (30x16, 99 mines)", createLargeBoard, ButtonOption::Animated());
+        static Component customBoardButton = Button("Custom board", showCustomBoardModal, ButtonOption::Animated());
+        // main menu component container
+        static Component mainMenuButtons = Container::Vertical({
+            Container::Horizontal({
+                smallBoardButton,
+                medBoardButton
+            }),
+            Container::Horizontal({
+                largeBoardButton,
+                customBoardButton
+            })
+        })
+        | Renderer([](Element buttons) {
+            return gridbox({
+                {smallBoardButton->Render(), medBoardButton->Render()},
+                {largeBoardButton->Render(), customBoardButton->Render()}
+            }) | center | bgcolor(Color::Black);
+        }) | Modal(customBoardModalComponent, &customBoardModalShown);
+
+        return constructWindowRenderer("Main menu", mainMenuButtons);
+    }
+
+    Component constructBoard() {
+        static Component board = Button(
+            "W: " + std::to_string(boardWidth) + ", H: " + std::to_string(boardHeight) + ", Mines: " + std::to_string(boardMineCount),
+            [](){}, ButtonOption::Animated()
+        );
+        return constructWindowRenderer("Flag the mines!", board);
+    }
+
+    Component parentContainer;
+    
     /* interface functions to interact with UI */
-    void setMainMenu() {
-        changeMenuSubtitle("Main menu");
-        setWindowBar();
-        setContentMainMenu();
-        setWindowRenderer();
-        //auto content = Button("placeholder", [](){std::cout << "Pressed placeholder button";}, ButtonOption::Animated());
-        //auto windowRenderer = createWindow(windowBar, content);
+    void initializeContainer() {
+        static Component mainMenuRenderer = constructMainMenu();
+        static Component boardRenderer = constructBoard();
+        static Component screens = Container::Tab({
+            mainMenuRenderer,
+            boardRenderer
+        }, &shownScreen);
+        parentContainer = Renderer(screens, [] {
+            Element displayed = mainMenuRenderer->Render() | center;
+            if (shownScreen == 1) {
+                displayed = dbox({
+                    boardRenderer->Render() | clear_under | center
+                });
+            }
+
+            return displayed;
+        });
     }
-    void setBoard(int width, int height, int mineCount) {
-        changeMenuSubtitle("Flag the mines");
-        setContentBoard(width, height, mineCount);
-        setWindowRenderer();
-        
-        // needs this to allow new content to be interactive
-        // for some reason the quit->yes option is not closing down the program properly after switching to the new board
-        screen.ExitLoopClosure();
-        startScreenLoop();
-    }
-    void changeMenuSubtitle(const std::string& subtitle) {
-        topBarSubtitle = subtitle;
-    }
-    void startScreenLoop() {
-        screen.Loop(windowRenderer);
+    void startGame() {
+        screen.Loop(parentContainer);
     }
 }

@@ -9,9 +9,9 @@ add_library(my_minesweeper
 )
 target_include_directories(my_minesweeper PUBLIC ../include)
 target_link_libraries(my_minesweeper
-    PRIVATE ftxui::screen
-    PRIVATE ftxui::dom
-    PRIVATE ftxui::component
+    PUBLIC ftxui::screen
+    PUBLIC ftxui::dom
+    PUBLIC ftxui::component
 )
 target_compile_features(my_minesweeper PUBLIC cxx_std_11)
 

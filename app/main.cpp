@@ -9,8 +9,8 @@ Start game by using game.cpp
 */
 
 int main() {
-    GameUI::setMainMenu();
-    GameUI::startScreenLoop();
+    GameUI::initializeContainer();
+    GameUI::startGame();
 
     return 0;
 }
