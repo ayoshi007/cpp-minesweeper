@@ -22,24 +22,6 @@ using namespace ftxui;
 
 // all variables are declared static to prevent external linkage
 namespace GameUI {
-    /* functors and variables */
-    static bool quitModalShown = false;
-    static bool customBoardModalShown = false;
-    static int boardWidth {constants::DEFAULT_CUSTOM_W};
-    static int boardHeight {constants::DEFAULT_CUSTOM_H};
-    static int minePercent {constants::DEFAULT_CUSTOM_PERCENT};
-    static int boardMineCount {constants::SMALL_BOARD_MINES};
-
-    static int shownScreen {0};
-    
-    static auto showQuitModal = [] { quitModalShown = true; };
-    static auto hideQuitModal = [] { quitModalShown = false; };
-    static auto showCustomBoardModal = [] { customBoardModalShown = true; };
-    static auto hideCustomBoardModal = [] { customBoardModalShown = false; };
-    
-    static auto showMainMenu = [] { shownScreen = 0; };
-    static auto showBoard  = [] { shownScreen = 1; };
-
     /* FTXUI elements and components that do not change */
     static ScreenInteractive screen = ScreenInteractive::TerminalOutput();
     static auto exitGame = screen.ExitLoopClosure();
@@ -68,6 +50,54 @@ namespace GameUI {
         boardMineCount = mineCount;
         showBoard();
     };
+    /* functors and variables */
+    static bool quitModalShown = false;
+    static bool customBoardModalShown = false;
+    static int boardWidth {constants::DEFAULT_CUSTOM_W};
+    static int boardHeight {constants::DEFAULT_CUSTOM_H};
+    static int minePercent {constants::DEFAULT_CUSTOM_PERCENT};
+    static int boardMineCount {constants::SMALL_BOARD_MINES};
+
+    static int shownScreen {0};
+    
+    static auto showQuitModal = [] { quitModalShown = true; };
+    static auto hideQuitModal = [] { quitModalShown = false; };
+    static auto showCustomBoardModal = [] { customBoardModalShown = true; };
+    static auto hideCustomBoardModal = [] { customBoardModalShown = false; };
+    
+    static auto showMainMenu = [] { shownScreen = 0; };
+    static auto showBoard  = [] { shownScreen = 1; };
+
+    static Component quitButton = Button("Quit", showQuitModal, ButtonOption::Ascii());
+    // modal component for custom board creation
+    static Component widthSlider = Slider("", &boardWidth, 4, 50, 1);
+    static Component heightSlider = Slider("", &boardHeight, 4, 50, 1);
+    static Component mineSlider = Slider("", &minePercent, 1, 99, 1);
+    static Component customBoardStart = Button("Start", createCustomBoard, ButtonOption::Animated());
+    static Component customBoardQuit = Button("Back", hideCustomBoardModal, ButtonOption::Animated());
+    static Component customBoardModalComponent = Container::Vertical({
+        widthSlider,
+        heightSlider,
+        mineSlider,
+        customBoardStart,
+        customBoardQuit
+    })
+    | Renderer([](Element components) {
+        return vbox({
+            text("Create custom board"),
+            separator(),
+            gridbox({
+                {sliderLabel("Width: ", boardWidth), widthSlider->Render()},
+                {sliderLabel("Height: ", boardHeight), heightSlider->Render()},
+                {sliderLabel("Mine %: ", minePercent), mineSlider->Render()}
+            }) | xflex,
+            separator(),
+            customBoardStart->Render(),
+            customBoardQuit->Render()
+        })
+        | border | bgcolor(Color::Black) | size(WIDTH, GREATER_THAN, screen.dimx() / 5);
+    });
+
     class ComponentRendererFactory {
         public:
         static Component makeYesNoModal(const std::string& prompt, std::function<void()> yesOp, std::function<void()> noOp) {
@@ -95,38 +125,10 @@ namespace GameUI {
                 });
             });
         }
-        static Component makeWindowRenderer(Component windowBar, Component content) {
-            C
-        }
-    };
-    static auto constructPromptOptionModal = [] (const std::string& prompt, std::function<void()> yesOp, std::function<void()> noOp) {
-        return Container::Vertical({
-            Button("Yes", yesOp, ButtonOption::Animated()),
-            Button("No", noOp, ButtonOption::Animated())
-        })
-        | Renderer([prompt](Element buttons) {
-            return vbox({
-                text(prompt),
-                separator(),
-                buttons
-            })
-            | border | bgcolor(Color::Black);
-        });
-    };
-    static auto constructWindowBar = [] (const std::string& subtitle) {
-        return Button("Quit", showQuitModal, ButtonOption::Ascii())
-            | Renderer([subtitle](Element button) {
-                return hbox({
-                    text("Terminal Minesweeper") | center,
-                    separator(),
-                    text(subtitle) | flex,
-                    button
-                });
-        });
     };
     static auto constructWindowRenderer = [] (const std::string& subtitle, Component& content) {
         static Component window = Container::Vertical({
-            constructWindowBar(subtitle),
+            ComponentRendererFactory::makeWindowBarRenderer(subtitle, quitButton),
             content
         });
         static Component windowRenderer = Renderer(window, []() {
@@ -136,7 +138,7 @@ namespace GameUI {
                 window->ChildAt(1)->Render()
             }) | border;
         });
-        windowRenderer |= Modal(constructPromptOptionModal("Quit game?", exitGame, hideQuitModal), &quitModalShown);
+        windowRenderer |= Modal(ComponentRendererFactory::makeYesNoModal("Quit game?", exitGame, hideQuitModal), &quitModalShown);
         windowRenderer |= bgcolor(Color::Black);
         return windowRenderer;
     };
