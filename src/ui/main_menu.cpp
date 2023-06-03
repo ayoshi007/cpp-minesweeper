@@ -1,0 +1,5 @@
+namespace GameUI {
+    namespace MainMenu {
+        
+    }
+}

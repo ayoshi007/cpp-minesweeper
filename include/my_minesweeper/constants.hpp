@@ -16,6 +16,9 @@ namespace constants {
     extern const int DEFAULT_CUSTOM_W {30};
     extern const int DEFAULT_CUSTOM_H {30};
     extern const int DEFAULT_CUSTOM_PERCENT {15};
+
+    extern const int MAIN_MENU_SCREEN {0};
+    extern const int GAME_BOARD_SCREEN {1};
     /*
     extern int smallBoard[SMALL_BOARD_H][SMALL_BOARD_W] {};
     extern int medBoard[MED_BOARD_H][MED_BOARD_W] {};

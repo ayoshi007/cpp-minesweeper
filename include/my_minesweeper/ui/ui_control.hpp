@@ -8,30 +8,32 @@
 // declare all components, variables, and functors that affect the state of the UI here
 using namespace ftxui;
 namespace GameUI {
-    ScreenInteractive screen;
-    int shown_screen;
-    std::function<void()> exit_game;
-    int boardWidth;
-    int boardHeight;
-    int mineCount;
+    extern const ScreenInteractive screen;
+    extern const std::function<void()> exit_game;
+    extern const std::string title;
 
-    std::string title;
-    Component window_bar;
-    Component create_window_bar_renderer(std::string subtitle);
     bool quit_modal_shown;
-    Component quit_button;
-    Component quit_modal;
-    std::function<void()> show_quit_modal;
-    std::function<void()> hide_quit_modal;
+    extern const std::function<void()> show_quit_modal;
+    extern const std::function<void()> hide_quit_modal;
+    extern const std::function<void()> show_main_menu;
+    extern const std::function<void()> show_game_board;
 
-    std::function<void()> show_main_menu;
-    std::function<void()> show_game_board;
+    Component create_window_bar_renderer(const std::string& title, const std::string& subtitle, Component quit_button);
+    Component create_yes_no_modal_renderer(const std::string& prompt, std::function<void()> yesOp, std::function<void()> noOp);
+    
+    extern const Component quit_button;
+
     Component main_menu_renderer;
     Component game_board_renderer;
     // Container to hold the main menu and game board renderers
     Component screens;
     // the main renderer
     Component main_renderer;
+
+    int shown_screen;
+    int board_width;
+    int board_height;
+    int mine_count;
 }
 
 #endif // UI_CONTROL
