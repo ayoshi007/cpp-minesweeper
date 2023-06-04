@@ -10,8 +10,7 @@ Start game by using game.cpp
 */
 
 int main() {
-    GameUI::initializeContainer();
-    GameUI::startGame();
+    GameUI::screen.Loop(GameUI::MainMenu::main_menu_buttons_renderer);
 
     return 0;
 }

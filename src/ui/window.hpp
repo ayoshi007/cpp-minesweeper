@@ -18,13 +18,12 @@ namespace GameUI {
     extern const std::function<void()> show_main_menu;
     extern const std::function<void()> show_game_board;
 
+    extern const Component quit_button;
+
     Component create_window_bar_renderer(const std::string& title, const std::string& subtitle, Component quit_button);
     Component create_yes_no_modal_renderer(const std::string& prompt, std::function<void()> yesOp, std::function<void()> noOp);
     
-    extern const Component quit_button;
-
-    Component main_menu_renderer;
-    Component game_board_renderer;
+    extern const Component main_menu_renderer;
     // Container to hold the main menu and game board renderers
     Component screens;
     // the main renderer

@@ -9,6 +9,7 @@ namespace GameUI {
     extern const ScreenInteractive screen = ScreenInteractive::TerminalOutput();
     extern const exit_game = ScreenInteractive::Active()->ExitLoopClosure();
     extern const std::string title = "TUI Minesweeper";
+    
 
     extern const bool quit_modal_shown = false;
     extern const auto show_quit_modal = [] { quit_modal_shown = true; };
