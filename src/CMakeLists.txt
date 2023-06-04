@@ -1,5 +1,4 @@
 add_library(my_minesweeper
-    core/constants.cpp
     core/constants.hpp
     core/controller.cpp
     core/controller.hpp
@@ -16,10 +15,9 @@ add_library(my_minesweeper
     ui/window.cpp
     ui/window.hpp
 )
+
 target_include_directories(my_minesweeper
-    PUBLIC core
-    PUBLIC game
-    PUBLIC ui
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 )
 target_link_libraries(my_minesweeper
     PUBLIC ftxui::screen
