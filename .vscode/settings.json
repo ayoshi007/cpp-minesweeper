@@ -1,0 +1,7 @@
+{
+    "cmake.sourceDirectory": "/home/moka/projects/cpp-minesweeper/src",
+    "files.associations": {
+        "iostream": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}
