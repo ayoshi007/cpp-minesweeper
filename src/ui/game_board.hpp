@@ -6,9 +6,9 @@
 // define all components and elements of the game board here
 using namespace ftxui;
 namespace GameUI {
-    namespace GameBoard {
-        Component placeholder_button;
-    }
+    class GameBoard {
+        
+    };
 }
 
 #endif // GAME_BOARD_HPP
