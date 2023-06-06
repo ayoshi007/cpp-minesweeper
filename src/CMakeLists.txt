@@ -12,6 +12,8 @@ add_library(my_minesweeper
     ui/main_menu.hpp
     ui/game_board.cpp
     ui/game_board.hpp
+    ui/ui_helper.cpp
+    ui/ui_helper.hpp
     ui/window.cpp
     ui/window.hpp
 )
