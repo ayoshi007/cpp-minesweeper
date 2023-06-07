@@ -1,5 +1,6 @@
 add_library(my_minesweeper
     core/constants.hpp
+    core/constants.cpp
     core/controller.cpp
     core/controller.hpp
     core/starter.cpp

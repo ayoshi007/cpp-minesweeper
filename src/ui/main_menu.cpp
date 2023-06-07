@@ -4,6 +4,7 @@
 
 #include <ui/main_menu.hpp>
 #include <ui/ui_helper.hpp>
+#include <core/constants.hpp>
 
 using namespace ftxui;
 
@@ -14,5 +15,6 @@ bool GameUI::MainMenu::custom_board_menu_shown = false;
 // Component GameUI::MainMenu::large_board_button = Button("Large (32x16, 99 mines)", , ButtonOption::Animated());
 
 std::string GameUI::MainMenu::get_subtitle() {
+    
     return subtitle;
 }
