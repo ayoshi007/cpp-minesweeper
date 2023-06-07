@@ -10,6 +10,7 @@ namespace GameUI {
     class Window {
         private:
         static std::string title;
+        static std::string current_subtitle;
         static int board_width;
         static int board_height;
         static int board_mine_count;

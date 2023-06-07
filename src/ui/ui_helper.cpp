@@ -19,3 +19,6 @@ Component GameUI::ModalPromptBuilder::build(const std::string& prompt, std::func
         | border | bgcolor(Color::Black);
     });
 }
+Element GameUI::build_text_element(const std::string& str) {
+    return text(str);
+}

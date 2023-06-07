@@ -9,6 +9,7 @@
 using namespace ftxui;
 
 std::string GameUI::Window::title = "TUI Minesweeper";
+std::string GameUI::Window::current_subtitle = "Subtitle";
 int GameUI::Window::board_width = constants::DEFAULT_CUSTOM_W;
 int GameUI::Window::board_height = constants::DEFAULT_CUSTOM_H;
 int GameUI::Window::board_mine_count = constants::SMALL_BOARD_MINES;
@@ -22,6 +23,7 @@ Component GameUI::Window::quit_button = Button(
     );
 
 void GameUI::Window::start() {
+    current_subtitle = GameUI::MainMenu::get_subtitle();
     Component quit_modal = GameUI::ModalPromptBuilder::build(
         "Quit?",
         GameUI::Window::screen.ExitLoopClosure(),
@@ -29,9 +31,9 @@ void GameUI::Window::start() {
         );
     Component window_bar_renderer = Renderer(quit_button, [](){
         return hbox({
-            text(GameUI::Window::title) | center,
+            build_text_element(GameUI::Window::title) | center,
             separator(),
-            text("subtitle placeholder") | flex,
+            build_text_element(current_subtitle) | flex,
             GameUI::Window::quit_button->Render()
         });
     });
