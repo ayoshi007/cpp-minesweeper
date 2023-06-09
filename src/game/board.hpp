@@ -19,7 +19,7 @@ namespace GameLogic {
         int width {};
         int height {};
         int mine_count {};
-        int flag_count {};
+        int correct_flags {};
         bool lost {};
         bool started {};
 
@@ -29,6 +29,10 @@ namespace GameLogic {
         std::vector<std::vector<Cover>> visible_map {};
         std::vector<std::pair<int, int>> mine_locations {};
         std::vector<std::pair<int, int>> flag_locations {};
+
+        const std::vector<std::pair<int, int>> get_surrounding_positions(int x, int y);
+        int count_surrounding_flags(int x, int y);
+        void uncover_surroundings(int x, int y);
 
         public:
         Board();
@@ -40,7 +44,7 @@ namespace GameLogic {
         const std::vector<std::pair<int, int>>& get_mine_locations();
         const std::vector<std::vector<Cover>>& get_visible_map();
         bool select(int x, int y);
-        void flag(int x, int y);
+        bool flag(int x, int y);
     };
 }
 
