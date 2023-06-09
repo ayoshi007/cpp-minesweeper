@@ -1,6 +1,7 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
+#include <unordered_map>
 #include <vector>
 #include <tuple>
 #include <utility>
@@ -31,7 +32,7 @@ namespace GameLogic {
         std::vector<std::pair<int, int>> flag_locations {};
 
         const std::vector<std::pair<int, int>> get_surrounding_positions(int x, int y);
-        int count_surrounding_flags(int x, int y);
+        std::unordered_map<Cover, int> get_visibilities(const std::vector<std::pair<int, int>>& surrounding_positions);
         bool uncover_surroundings(int x, int y);
 
         public:
@@ -39,7 +40,14 @@ namespace GameLogic {
         Board(int mt_seed);
         Board(int w, int h, int mines, int seed);
         Board(int w, int h, int mines);
+        bool is_game_lost();
+        bool is_game_started();
+        int get_mine_count();
+        int get_correct_flags();
+        void clear_board();
         void set_board(int w, int h, int mines);
+        
+        
         const std::vector<std::vector<int>>& get_map();
         const std::vector<std::pair<int, int>>& get_mine_locations();
         const std::vector<std::vector<Cover>>& get_visible_map();

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unordered_map>
 #include <string>
 #include <numeric>
 #include <algorithm>
@@ -23,12 +24,24 @@ GameLogic::Board::Board(int w, int h, int mines) :
     {
     set_board(w, h, mines);
 }
-void GameLogic::Board::set_board(int w, int h, int mines) {
+bool GameLogic::Board::is_game_lost() { return lost; }
+bool GameLogic::Board::is_game_started() { return started; }
+int GameLogic::Board::get_mine_count() { return mine_count; }
+int GameLogic::Board::get_correct_flags() { return correct_flags; }
+void GameLogic::Board::clear_board() {
+    correct_flags = 0;
+    width = 0;
+    height = 0;
+    mine_count = 0;
+    lost = false;
+    started = false;
     map.clear();
     visible_map.clear();
     mine_locations.clear();
     flag_locations.clear();
-
+}
+void GameLogic::Board::set_board(int w, int h, int mines) {
+    clear_board();
     width = w;
     height = h;
     mine_count = mines;
@@ -110,66 +123,62 @@ const std::vector<std::pair<int, int>> GameLogic::Board::get_surrounding_positio
 
     return surrounding_positions;
 }
-int GameLogic::Board::count_surrounding_flags(int x, int y) {
-    const std::vector<std::pair<int, int>> surrounding_positions = get_surrounding_positions(x, y);
-    int count = 0;
+std::unordered_map<GameLogic::Board::Cover, int> GameLogic::Board::get_visibilities(const std::vector<std::pair<int, int>>& surrounding_positions) {
+    std::unordered_map<GameLogic::Board::Cover, int> counts;
+    counts[Cover::Covered] = 0;
+    counts[Cover::Uncovered] = 0;
+    counts[Cover::Flagged] = 0;
     for (auto pos: surrounding_positions) {
-        if (visible_map[pos.first][pos.second] == Cover::Flagged) {
-            count++;
-        }
+        counts[visible_map[pos.first][pos.second]]++;
     }
-    return count;
+    return counts;
 }
 bool GameLogic::Board::uncover_surroundings(int x, int y) {
-    /*
-    visible_map[x][y] = Cover::Uncovered;
+    static int count = 0;
+    // count++;
+    // if (count > 100) {
+    //     std::exit(1);
+    // }
     if (map[x][y] == -1) {
+        visible_map[x][y] = Cover::Uncovered;
         return true;
     }
+    bool mine_detonated = false;
     const std::vector<std::pair<int, int>> surrounding_positions = get_surrounding_positions(x, y);
-    // reveal all around recursively
-    if (map[x][y] == 0) {
-        for (auto pos: surrounding_positions) {
-            uncover_surroundings(pos.first, pos.second);
+    if (visible_map[x][y] == Cover::Covered) {
+        visible_map[x][y] = Cover::Uncovered;
+        if (map[x][y] != 0) {
+            //std::cout << "Uncovering r = " << x << ", c = " << y << '\n';
+            visible_map[x][y] = Cover::Uncovered;
+        } else {
+            //std::cout << "Uncovering all around r = " << x << ", c = " << y << '\n';
+            visible_map[x][y] == Cover::Uncovered;
+            for (auto pos: surrounding_positions) {
+                mine_detonated |= select(pos.first, pos.second);
+            }
         }
     }
-    // reveal all around only if there are enough flags around the cell
-    else {
-
-    }
-    int count = 0;
-    for (auto pos: surrounding_positions) {
-        if (visible_map[pos.first][pos.second] == Cover::Flagged) {
-            count++;
+    else if (map[x][y] != 0) {
+        //std::cout << "Checking flags around r = " << x << ", c = " << y << '\n';
+        std::unordered_map<Cover, int> visibilties = get_visibilities(surrounding_positions);
+        if (visibilties[Cover::Covered] > 0 && visibilties[Cover::Flagged] == map[x][y]) {
+            //std::cout << "Uncovering around r = " << x << ", c = " << y << '\n';
+            for (auto pos: surrounding_positions) {
+                mine_detonated |= select(pos.first, pos.second);
+            }
         }
     }
-    if (map[x][y] == 0) {
-
-    }
-    visible_map[x][y] = Cover::Uncovered;
-    if (map[x][y] == -1) {
-        return true;
-    }
-    
-    bool res = false;
-    for (auto pos: surrounding_positions) {
-        if (visible_map[pos.first][pos.second] == Cover::Covered) {
-            res |= uncover_surroundings(pos.first, pos.second);
-        }
-    }
-    return res;
-    */
-   return false;
+    return mine_detonated;
 }
 bool GameLogic::Board::select(int x, int y) {
     switch(visible_map[x][y]) {
         case Cover::Covered:
         case Cover::Uncovered:
-            return uncover_surroundings(x, y);
+            lost = uncover_surroundings(x, y);
         case Cover::Flagged:
             break;
     }
-    return false;
+    return lost;
 }
 bool GameLogic::Board::flag(int x, int y) {
     switch (visible_map[x][y]) {

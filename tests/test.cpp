@@ -4,56 +4,50 @@
 
 GameLogic::Board board {5}; // seed = 1
 
-void print_map() {
-    const std::vector<std::vector<int>>& map = board.get_map();
-
+template <typename T>
+void print_map(const std::vector<std::vector<T>>& map) {
     for (auto row: map) {
         for (auto col: row) {
             std::cout << col << '\t';
         }
         std::cout << '\n';
     }
-    std::cout << '\n';
-}
-void print_visible_map() {
-    const std::vector<std::vector<GameLogic::Board::Cover>>& map = board.get_visible_map();
-
-    for (auto row: map) {
-        for (auto col: row) {
-            std::cout << col << '\t';
-        }
-        std::cout << '\n';
-    }
-    std::cout << '\n';
-}
-void print_state_map() {
-    const std::vector<std::vector<std::string>>& map = board.get_state_map();
-
-    for (auto row: map) {
-        for (auto col: row) {
-            std::cout << col << '\t';
-        }
-        std::cout << '\n';
-    }
-    std::cout << '\n';
 }
 void test_set_board(int w, int h, int mines) {
     std::cout << "Setting board with w = " + std::to_string(w) + ", h = " + std::to_string(h) + ", mines = " + std::to_string(mines) + "\n";
     board.set_board(w, h, mines);
-    print_map();
+    print_map(board.get_map());
 }
 void test_flag(int x, int y) {
-    std::cout << "Flagging board at x = " + std::to_string(x) + ", y = " + std::to_string(y) + "\n";
+    std::cout << "Flagging cell at x = " + std::to_string(x) + ", y = " + std::to_string(y) + "\n";
     board.flag(x, y);
-    print_state_map();
+    print_map(board.get_state_map());
+}
+void test_select(int x, int y) {
+    std::cout << "Selecting cell at at x = " + std::to_string(x) + ", y = " + std::to_string(y) + "\n";
+    bool detonation = board.select(x, y);
+    print_map(board.get_state_map());
+    if (detonation) {
+        std::cout << "You detonated a mine\n";
+    }
 }
 
 int main() {
     std::cout << "Showing test output for seeded board generation\n";
     test_set_board(5, 5, 5);
-    test_flag(0, 0);
-    test_flag(0, 1);
-    test_flag(0, 0);
+    test_select(4, 2);
+    test_select(4, 4);
+    test_select(3, 4);
+
+    std::cout << "\nTesting a 8x8 board with 10 mines\n";
+    test_set_board(8, 8, 10);
+    test_select(0, 0);
+    test_flag(3, 2);
+    test_select(2, 2);
+    test_flag(0, 4);
+    test_flag(1, 4);
+    test_select(1, 3);
+    test_select(1, 3);
     
     return 0;
 }
