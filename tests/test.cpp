@@ -25,6 +25,9 @@ void test_set_board() {
 }
 
 int main() {
+    std::cout << "Showing test output for random board generation\n";
     test_set_board();
+
+    
     return 0;
 }
