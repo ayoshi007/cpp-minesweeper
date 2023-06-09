@@ -26,6 +26,17 @@ void print_visible_map() {
     }
     std::cout << '\n';
 }
+void print_state_map() {
+    const std::vector<std::vector<std::string>>& map = board.get_state_map();
+
+    for (auto row: map) {
+        for (auto col: row) {
+            std::cout << col << '\t';
+        }
+        std::cout << '\n';
+    }
+    std::cout << '\n';
+}
 void test_set_board(int w, int h, int mines) {
     std::cout << "Setting board with w = " + std::to_string(w) + ", h = " + std::to_string(h) + ", mines = " + std::to_string(mines) + "\n";
     board.set_board(w, h, mines);
@@ -34,7 +45,7 @@ void test_set_board(int w, int h, int mines) {
 void test_flag(int x, int y) {
     std::cout << "Flagging board at x = " + std::to_string(x) + ", y = " + std::to_string(y) + "\n";
     board.flag(x, y);
-    print_visible_map();
+    print_state_map();
 }
 
 int main() {

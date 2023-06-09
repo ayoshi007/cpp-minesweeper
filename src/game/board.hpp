@@ -32,7 +32,7 @@ namespace GameLogic {
 
         const std::vector<std::pair<int, int>> get_surrounding_positions(int x, int y);
         int count_surrounding_flags(int x, int y);
-        void uncover_surroundings(int x, int y);
+        bool uncover_surroundings(int x, int y);
 
         public:
         Board();
@@ -43,6 +43,7 @@ namespace GameLogic {
         const std::vector<std::vector<int>>& get_map();
         const std::vector<std::pair<int, int>>& get_mine_locations();
         const std::vector<std::vector<Cover>>& get_visible_map();
+        const std::vector<std::vector<std::string>> get_state_map();
         bool select(int x, int y);
         bool flag(int x, int y);
     };
