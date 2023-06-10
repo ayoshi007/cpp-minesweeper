@@ -5,7 +5,6 @@
 #include <ui/game_board.hpp>
 #include <ui/main_menu.hpp>
 
-using namespace ftxui;
 namespace GameUI {
     class Window {
         private:
@@ -20,10 +19,10 @@ namespace GameUI {
         static MainMenu main_menu_components;
         static GameBoard game_board_components;
 
-        static Component quit_button;
+        static ftxui::Component quit_button;
 
-        static Component main_renderer;
-        static ScreenInteractive screen;
+        static ftxui::Component main_renderer;
+        static ftxui::ScreenInteractive screen;
 
         public:
            static void start();

@@ -4,7 +4,7 @@
 #include <functional>
 #include <ftxui/component/component.hpp>
 
-using namespace ftxui;
+
 namespace GameUI {
     class MainMenu {
         private:
