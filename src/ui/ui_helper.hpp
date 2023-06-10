@@ -5,13 +5,13 @@
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
 
-using namespace ftxui;
+
 namespace GameUI {
     class ModalPromptBuilder {
         public:
-        static Component build(const std::string& prompt, std::function<void()> yes_op, std::function<void()> no_op);
+        static ftxui::Component build(const std::string& prompt, std::function<void()> yes_op, std::function<void()> no_op);
     };
-    Element build_text_element(const std::string& str);
+    ftxui::Element build_text_element(const std::string& str);
 }
 
 #endif // UI_HELPER_HPP

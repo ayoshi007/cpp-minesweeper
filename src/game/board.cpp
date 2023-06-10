@@ -1,3 +1,5 @@
+#include <core/constants.hpp>
+
 #include <iostream>
 #include <unordered_map>
 #include <string>
@@ -7,8 +9,8 @@
 #include <game/board.hpp>
 
 GameLogic::Board::Board() = default;
-GameLogic::Board::Board(int mt_seed) : Board{} {
-    g.seed(mt_seed);
+GameLogic::Board::Board(int mt_seed) : Board{constants::DEFAULT_CUSTOM_W, constants::DEFAULT_CUSTOM_H, constants::SMALL_BOARD_MINES, mt_seed} {
+
 }
 GameLogic::Board::Board(int w, int h, int mines, int mt_seed) : Board{w, h, mines} {
     g.seed(mt_seed);
@@ -16,6 +18,7 @@ GameLogic::Board::Board(int w, int h, int mines, int mt_seed) : Board{w, h, mine
 GameLogic::Board::Board(int w, int h, int mines) :
     correct_flags { 0 },
     lost { false },
+    done { false },
     started { false },
     map {},
     visible_map {},
@@ -25,6 +28,7 @@ GameLogic::Board::Board(int w, int h, int mines) :
     set_board(w, h, mines);
 }
 bool GameLogic::Board::is_game_lost() { return lost; }
+bool GameLogic::Board::is_game_done() { return done; }
 bool GameLogic::Board::is_game_started() { return started; }
 int GameLogic::Board::get_mine_count() { return mine_count; }
 int GameLogic::Board::get_correct_flags() { return correct_flags; }
@@ -34,6 +38,7 @@ void GameLogic::Board::clear_board() {
     height = 0;
     mine_count = 0;
     lost = false;
+    done = false;
     started = false;
     map.clear();
     visible_map.clear();
@@ -52,7 +57,6 @@ void GameLogic::Board::set_board(int w, int h, int mines) {
     std::vector<int> positions (w * h);
     
     std::iota(positions.begin(), positions.end(), 0);
-    
     std::shuffle(positions.begin(), positions.end(), g);
     for (int i{}; i < mines; i++) {
         int mine_pos = positions[i];
@@ -60,7 +64,7 @@ void GameLogic::Board::set_board(int w, int h, int mines) {
         int c = mine_pos % w;
         map[r][c] = -1;
         visible_map[r][c] = Cover::Covered;
-        mine_locations.push_back(std::pair<int, int> {r, c});
+        mine_locations.insert(i);
         const std::vector<std::pair<int, int>> surrounding_positions = get_surrounding_positions(r, c);
         for (auto pos: surrounding_positions) {
             map[pos.first][pos.second] = map[pos.first][pos.second] == -1 ? map[pos.first][pos.second] : map[pos.first][pos.second] + 1;
@@ -90,7 +94,7 @@ const std::vector<std::vector<std::string>> GameLogic::Board::get_state_map() {
     }
     return map_state;
 }
-const std::vector<std::pair<int, int>>& GameLogic::Board::get_mine_locations() {
+const std::unordered_set<int>& GameLogic::Board::get_mine_locations() {
     return mine_locations;
 }
 const std::vector<std::pair<int, int>> GameLogic::Board::get_surrounding_positions(int x, int y) {
@@ -170,7 +174,42 @@ bool GameLogic::Board::uncover_surroundings(int x, int y) {
     }
     return mine_detonated;
 }
+std::pair<int, int> GameLogic::Board::find_free_pos(int x, int y) {
+    std::vector<int> positions (width * height);
+    
+    std::iota(positions.begin(), positions.end(), 0);
+    std::shuffle(positions.begin(), positions.end(), g);
+    int i{};
+    while (mine_locations.find(positions[i]) != mine_locations.end()) {
+        i++;
+    }
+    std::pair<int, int> free_pos {positions[i] / width, positions[i] % width};
+    return free_pos;
+}
 bool GameLogic::Board::select(int x, int y) {
+    if (!started) {
+        started = true;
+        if (map[x][y] == -1) {
+            std::pair<int, int> free_pos = find_free_pos(x, y);
+            std::vector<std::pair<int, int>> old_spot_surroundings = get_surrounding_positions(x, y);
+            std::vector<std::pair<int, int>> new_spot_surroundings = get_surrounding_positions(free_pos.first, free_pos.second);
+            map[x][y] = 0;
+            mine_locations.erase(x * width + y);
+            for (auto pos: old_spot_surroundings) {
+                if (map[pos.first][pos.second] == -1) {
+                    map[x][y]++;
+                } else {
+                    map[pos.first][pos.second] = std::max(map[pos.first][pos.second] - 1, 0);
+                }
+            }
+
+            map[free_pos.first][free_pos.second] = -1;
+            mine_locations.insert(free_pos.first * width + free_pos.second);
+            for (auto pos: new_spot_surroundings) {
+                map[pos.first][pos.second] = map[pos.first][pos.second] == -1 ? map[pos.first][pos.second] : map[pos.first][pos.second] + 1;
+            }
+        }
+    }
     switch(visible_map[x][y]) {
         case Cover::Covered:
         case Cover::Uncovered:
@@ -178,21 +217,26 @@ bool GameLogic::Board::select(int x, int y) {
         case Cover::Flagged:
             break;
     }
+    done |= lost;
     return lost;
 }
 bool GameLogic::Board::flag(int x, int y) {
     switch (visible_map[x][y]) {
         case Cover::Covered:
             visible_map[x][y] = Cover::Flagged;
+            if (map[x][y] == -1) {
+                correct_flags++;
+            }
             break;
         case Cover::Uncovered:
             break;
         case Cover::Flagged:
             visible_map[x][y] = Cover::Covered;
+            if (map[x][y] == -1) {
+                correct_flags--;
+            }
             break;
     }
-    if (map[x][y] == -1) {
-        correct_flags++;
-    }
-    return correct_flags == mine_count;
+    done = correct_flags == mine_count;
+    return done;
 }

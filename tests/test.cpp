@@ -41,13 +41,8 @@ int main() {
 
     std::cout << "\nTesting a 8x8 board with 10 mines\n";
     test_set_board(8, 8, 10);
-    test_select(0, 0);
-    test_flag(3, 2);
-    test_select(2, 2);
-    test_flag(0, 4);
-    test_flag(1, 4);
-    test_select(1, 3);
-    test_select(1, 3);
+    test_select(0, 4);
+    print_map(board.get_map());
     
     return 0;
 }
