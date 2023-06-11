@@ -2,7 +2,7 @@
 
 #include <game/board.hpp>
 
-GameLogic::Board board {5}; // seed = 1
+GameLogic::Board board {5}; // seed = 5
 
 template <typename T>
 void print_map(const std::vector<std::vector<T>>& map) {
@@ -39,10 +39,14 @@ int main() {
     test_select(4, 4);
     test_select(3, 4);
 
-    std::cout << "\nTesting a 8x8 board with 10 mines\n";
+    std::cout << "\nTesting selecting a mine position at first move\n";
     test_set_board(8, 8, 10);
     test_select(0, 4);
     print_map(board.get_map());
     
+    test_set_board(8, 8, 10);
+    test_select(1, 2);
+    print_map(board.get_map());
+
     return 0;
 }
