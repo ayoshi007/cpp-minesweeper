@@ -3,6 +3,10 @@
 ---
 A TUI (FTXUI) Minesweeper program made for practicing C++
 
+Note that this project is being made on an Ubuntu system with no cross-platform compatibility in mind.
+
+The bash scripts are for building in Debug and Release mode.
+
 Subdirectory explanations:
 - app - holds the main file that will become the target executable
 - tests - holds tests for the library created from src

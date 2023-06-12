@@ -207,15 +207,10 @@ namespace GameLogic {
         // uncover Covered cells
         if (visible_map[x][y] == Cover::Covered) {
             visible_map[x][y] = Cover::Uncovered;
-            // cells with a value greater than 0 only uncover themselves
-            if (map[x][y] != 0) {
-                //std::cout << "Uncovering r = " << x << ", c = " << y << '\n';
-                visible_map[x][y] = Cover::Uncovered;
-            }
             // cells with a value 0 will uncover their surroundings recursively
-            else {
+            // note that cells with a value greater than 0 will only uncover themselves
+            if (map[x][y] == 0) {
                 //std::cout << "Uncovering all around r = " << x << ", c = " << y << '\n';
-                visible_map[x][y] == Cover::Uncovered;
                 for (auto pos: surrounding_positions) {
                     // recursive call
                     mine_detonated |= select(pos.first, pos.second);
@@ -247,7 +242,7 @@ namespace GameLogic {
      * Output:
      *  the coordinates of an un-mined cell
     */
-    std::pair<int, int> Board::find_free_pos(int x, int y) {
+    std::pair<int, int> Board::find_free_pos() {
         // creates a random sequence of positions from which to choose from
         std::vector<int> positions (width * height);
         std::iota(positions.begin(), positions.end(), 0);
@@ -277,7 +272,7 @@ namespace GameLogic {
             // if the first selected position is a mine position, swap it with a free position and then proceed with the rest of the function
             if (map[x][y] == -1) {
                 // find a free position, and the surrounding positions of the selected and free position
-                std::pair<int, int> free_pos = find_free_pos(x, y);
+                std::pair<int, int> free_pos = find_free_pos();
                 std::vector<std::pair<int, int>> old_spot_surroundings = get_surrounding_positions(x, y);
                 std::vector<std::pair<int, int>> new_spot_surroundings = get_surrounding_positions(free_pos.first, free_pos.second);
 
@@ -348,8 +343,8 @@ namespace GameLogic {
 }
 
 TEST_CASE("testing Board object creation") {
-    GameLogic::Board b {5, 5, 5};
+    GameLogic::Board b {5, 5, 10};
     CHECK(b.get_width() == 5);
     CHECK(b.get_height() == 5);
-    CHECK(b.get_mine_count() == 5);
+    CHECK(b.get_mine_count() == 10);
 }

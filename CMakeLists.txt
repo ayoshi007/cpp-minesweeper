@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.20)
 
 include(FetchContent)
 set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
@@ -11,8 +11,19 @@ FetchContent_Declare(ftxui
 )
 FetchContent_MakeAvailable(ftxui)
 # ----------------------
+# --- fetching doctest ---
+FetchContent_Declare(doctest
+    GIT_REPOSITORY https://github.com/doctest/doctest
+    GIT_TAG v2.4.11
+)
+FetchContent_MakeAvailable(doctest)
+# ------------------------
 
 option(ENABLE_TESTING "Build unit tests" ON)
+
+if (NOT ENABLE_TESTING)
+    add_definitions("-DDOCTEST_CONFIG_DISABLE")
+endif()
 
 project(
     cpp-minesweeper

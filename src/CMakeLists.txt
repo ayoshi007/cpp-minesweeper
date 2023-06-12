@@ -16,21 +16,18 @@ set(my_minesweeper_sources
     ui/ui_helper.hpp
     ui/window.cpp
     ui/window.hpp
-    doctest/doctest.h
 )
-add_library(my_minesweeper
+add_library(my_minesweeper_obj OBJECT
     ${my_minesweeper_sources}
 )
-target_include_directories(my_minesweeper
+target_include_directories(my_minesweeper_obj
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 )
-target_link_libraries(my_minesweeper
+target_link_libraries(my_minesweeper_obj
     PUBLIC ftxui::screen
     PUBLIC ftxui::dom
     PUBLIC ftxui::component
+    PUBLIC doctest::doctest
 )
-target_compile_features(my_minesweeper PUBLIC cxx_std_11)
-add_compile_options(-Wall -Wextra -Wpedantic -Werror)
-if (ENABLE_TESTING)
-    add_compile_definitions(DOCTEST_CONFIG_DISABLE)
-endif()
+target_compile_features(my_minesweeper_obj PUBLIC cxx_std_11)
+target_compile_options(my_minesweeper_obj PUBLIC -Wall -Wextra -Wpedantic -Werror)

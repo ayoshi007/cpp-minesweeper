@@ -27,7 +27,7 @@ namespace GameLogic {
             Flagged
         };
         private:
-        int width {};
+        int width;
         int height {};
         int mine_count {};
         int flags {};
@@ -51,7 +51,7 @@ namespace GameLogic {
         // helper function for select
         bool uncover_surroundings(int x, int y);
         // randomly finds an unmined position
-        std::pair<int, int> find_free_pos(int x, int y);
+        std::pair<int, int> find_free_pos();
 
         public:
         // seeded constructors are included for testability
