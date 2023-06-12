@@ -1,5 +1,7 @@
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include <doctest/doctest.h>
+/*
 #include <iostream>
-
 #include <game/board.hpp>
 
 GameLogic::Board board {5}; // seed = 5
@@ -50,3 +52,4 @@ int main() {
 
     return 0;
 }
+*/

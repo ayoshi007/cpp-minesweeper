@@ -1,3 +1,4 @@
+#include <doctest/doctest.h>
 #include <core/constants.hpp>
 
 #include <iostream>
@@ -344,4 +345,11 @@ namespace GameLogic {
         done = correct_flags == mine_count;
         return done;
     }
+}
+
+TEST_CASE("testing Board object creation") {
+    GameLogic::Board b {5, 5, 5};
+    CHECK(b.get_width() == 5);
+    CHECK(b.get_height() == 5);
+    CHECK(b.get_mine_count() == 5);
 }
