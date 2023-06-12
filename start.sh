@@ -1,3 +1,3 @@
-cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake
+cmake -B build -S .
 cd build && cmake --build .
 # cp app/cpp-ms ../cpp-ms
