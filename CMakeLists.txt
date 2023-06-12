@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.20)
 
 include(FetchContent)
 set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
-# include(ExternalProject)
 
 # --- fetching FTXUI ---
 FetchContent_Declare(ftxui
@@ -19,9 +18,13 @@ FetchContent_Declare(doctest
 FetchContent_MakeAvailable(doctest)
 # ------------------------
 
-option(ENABLE_TESTING "Build unit tests" ON)
+option(CPPMS_ENABLE_TESTING "Build unit tests" ON)
 
-if (NOT ENABLE_TESTING)
+# set(FTXUI_BUILD_EXAMPLES OFF)
+# set(FTXUI_BUILD_TESTS OFF)
+
+
+if (NOT CPPMS_ENABLE_TESTING)
     add_definitions("-DDOCTEST_CONFIG_DISABLE")
 endif()
 
