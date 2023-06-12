@@ -1,4 +1,4 @@
-#include <core/controller.hpp>
+#include <game/controller.hpp>
 #include <game/board.hpp>
 
 namespace GameLogic {
