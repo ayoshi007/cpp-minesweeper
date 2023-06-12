@@ -1,0 +1,2 @@
+cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release -DCPPMS_ENABLE_TESTING=OFF -DFTXUI_BUILD_EXAMPLES=OFF -DFTXUI_BUILD_TESTS=OFF
+cmake --build build/release

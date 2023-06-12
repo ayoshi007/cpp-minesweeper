@@ -1,0 +1,8 @@
+if (CPPMS_ENABLE_TESTING)
+    enable_testing()
+    add_executable(test_ms test.cpp)
+    add_test(NAME test_ms COMMAND test_ms)
+    target_compile_features(test_ms PRIVATE cxx_std_11)
+    target_include_directories(test_ms PRIVATE src)
+    target_link_libraries(test_ms PRIVATE my_minesweeper_obj)
+endif()

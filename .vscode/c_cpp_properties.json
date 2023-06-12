@@ -4,7 +4,6 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/vcpkg/packages/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

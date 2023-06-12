@@ -1,28 +1,33 @@
-add_library(my_minesweeper
+# library is made an object library for testing with doctest
+set(my_minesweeper_sources
     core/constants.hpp
-    core/controller.cpp
-    core/controller.hpp
+    core/constants.cpp
     core/starter.cpp
     core/starter.hpp
     game/board.cpp
     game/board.hpp
-    game/session.cpp
-    game/session.hpp
+    game/controller.cpp
+    game/controller.hpp
     ui/main_menu.cpp
     ui/main_menu.hpp
     ui/game_board.cpp
     ui/game_board.hpp
+    ui/ui_helper.cpp
+    ui/ui_helper.hpp
     ui/window.cpp
     ui/window.hpp
 )
-
-target_include_directories(my_minesweeper
+add_library(my_minesweeper_obj OBJECT
+    ${my_minesweeper_sources}
+)
+target_include_directories(my_minesweeper_obj
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 )
-target_link_libraries(my_minesweeper
+target_link_libraries(my_minesweeper_obj
     PUBLIC ftxui::screen
     PUBLIC ftxui::dom
     PUBLIC ftxui::component
+    PUBLIC doctest::doctest
 )
-target_compile_features(my_minesweeper PUBLIC cxx_std_11)
-
+target_compile_features(my_minesweeper_obj PUBLIC cxx_std_11)
+target_compile_options(my_minesweeper_obj PUBLIC -Wall -Wextra -Wpedantic -Werror)

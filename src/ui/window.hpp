@@ -9,6 +9,7 @@ namespace GameUI {
     class Window {
         private:
         static std::string title;
+        static std::string current_subtitle;
         static int board_width;
         static int board_height;
         static int board_mine_count;
@@ -18,15 +19,14 @@ namespace GameUI {
         static MainMenu main_menu_components;
         static GameBoard game_board_components;
 
-        static Component main_renderer;
-        static ScreenInteractive screen;
+        static ftxui::Component quit_button;
+
+        static ftxui::Component main_renderer;
+        static ftxui::ScreenInteractive screen;
 
         public:
-        static int get_width();
-        static int get_height();
-        static int get_mine_count();
-        static int get_shown_screen();
-
+           static void start();
+           static void show_main_menu();
     };
 }
 
