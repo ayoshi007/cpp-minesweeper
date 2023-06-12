@@ -1,9 +1,10 @@
 # C++ TUI Minesweeper
+### A TUI (FTXUI) Minesweeper program made with C++
 
----
-A TUI (FTXUI) Minesweeper program made for practicing C++
+Developed on Ubuntu
 
-Note that this project is being made on an Ubuntu system with no cross-platform compatibility in mind.
+This project is a largely pedagogical project for me to practice C++ programming, project design, and test-driven development.
+
 
 The bash scripts are for building in Debug and Release mode.
 
