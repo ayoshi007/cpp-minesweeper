@@ -8,6 +8,7 @@
 #include <random>
 #include <game/board.hpp>
 
+
 GameLogic::Board::Board() = default;
 GameLogic::Board::Board(int mt_seed) : Board{constants::DEFAULT_CUSTOM_W, constants::DEFAULT_CUSTOM_H, constants::SMALL_BOARD_MINES, mt_seed} {
 
@@ -16,6 +17,7 @@ GameLogic::Board::Board(int w, int h, int mines, int mt_seed) : Board{w, h, mine
     g.seed(mt_seed);
 }
 GameLogic::Board::Board(int w, int h, int mines) :
+    flags { 0 }, 
     correct_flags { 0 },
     lost { false },
     done { false },
@@ -27,15 +29,19 @@ GameLogic::Board::Board(int w, int h, int mines) :
     {
     set_board(w, h, mines);
 }
+int GameLogic::Board::get_width() { return width; }
+int GameLogic::Board::get_height() { return height; }
 bool GameLogic::Board::is_game_lost() { return lost; }
 bool GameLogic::Board::is_game_done() { return done; }
 bool GameLogic::Board::is_game_started() { return started; }
+int GameLogic::Board::get_flag_count() { return flags; }
 int GameLogic::Board::get_mine_count() { return mine_count; }
 int GameLogic::Board::get_correct_flags() { return correct_flags; }
 /**
  * Clears the board's state back to default values
 */
 void GameLogic::Board::clear_board() {
+    flags = 0;
     correct_flags = 0;
     width = 0;
     height = 0;
@@ -319,6 +325,7 @@ bool GameLogic::Board::flag(int x, int y) {
         // covered locations may be flagged
         case Cover::Covered:
             visible_map[x][y] = Cover::Flagged;
+            flags++;
             if (map[x][y] == -1) {
                 correct_flags++;
             }
@@ -328,6 +335,7 @@ bool GameLogic::Board::flag(int x, int y) {
         // flagged locations may be unflagged
         case Cover::Flagged:
             visible_map[x][y] = Cover::Covered;
+            flags--;
             if (map[x][y] == -1) {
                 correct_flags--;
             }

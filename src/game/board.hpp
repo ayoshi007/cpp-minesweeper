@@ -30,6 +30,7 @@ namespace GameLogic {
         int width {};
         int height {};
         int mine_count {};
+        int flags {};
         int correct_flags {};
         bool lost {};
         bool done {};
@@ -58,9 +59,12 @@ namespace GameLogic {
         Board(int mt_seed);
         Board(int w, int h, int mines, int seed);
         Board(int w, int h, int mines);
+        int get_width();
+        int get_height();
         bool is_game_lost();
         bool is_game_done();
         bool is_game_started();
+        int get_flag_count();
         int get_mine_count();
         int get_correct_flags();
         void clear_board();
