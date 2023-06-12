@@ -4,7 +4,7 @@
 #include <ftxui/component/component.hpp>
 
 // define all components and elements of the game board here
-using namespace ftxui;
+
 namespace GameUI {
     class GameBoard {
         

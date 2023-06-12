@@ -8,6 +8,6 @@ Start game by using game.cpp
 */
 
 int main() {
-    
+    GameUI::Window::start();
     return 0;
 }

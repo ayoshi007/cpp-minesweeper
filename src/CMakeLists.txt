@@ -1,17 +1,18 @@
 add_library(my_minesweeper
     core/constants.hpp
-    core/controller.cpp
-    core/controller.hpp
+    core/constants.cpp
     core/starter.cpp
     core/starter.hpp
     game/board.cpp
     game/board.hpp
-    game/session.cpp
-    game/session.hpp
+    game/controller.cpp
+    game/controller.hpp
     ui/main_menu.cpp
     ui/main_menu.hpp
     ui/game_board.cpp
     ui/game_board.hpp
+    ui/ui_helper.cpp
+    ui/ui_helper.hpp
     ui/window.cpp
     ui/window.hpp
 )
