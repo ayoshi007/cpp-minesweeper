@@ -1,5 +1,3 @@
-# convert 
-
 while getopts "G:B:T" flag
 do
     case "${flag}" in
