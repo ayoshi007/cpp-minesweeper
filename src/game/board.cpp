@@ -23,7 +23,8 @@ namespace GameLogic {
         map {},
         visible_map {},
         mine_locations {},
-        flag_locations {}
+        flag_locations {},
+        most_recent_changes {}
         {
         g.seed(mt_seed);
         set_board(w, h, mines);
@@ -37,7 +38,8 @@ namespace GameLogic {
         map {},
         visible_map {},
         mine_locations {},
-        flag_locations {}
+        flag_locations {},
+        most_recent_changes {}
         {
         set_board(w, h, mines);
     }
