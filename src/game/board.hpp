@@ -42,7 +42,7 @@ namespace GameLogic {
         std::vector<std::vector<int>> map {};
         std::vector<std::vector<Cover>> visible_map {};
         std::unordered_set<int> mine_locations {};
-        std::vector<std::pair<int, int>> flag_locations {};
+        std::unordered_set<int> flag_locations {};
         std::vector<std::pair<std::pair<int, int>, int>> most_recent_changes {};
 
         // returns all surrounding coordinates to the input position
@@ -73,6 +73,7 @@ namespace GameLogic {
                 
         const std::vector<std::vector<int>>& get_map();
         const std::unordered_set<int>& get_mine_locations();
+        const std::unordered_set<int>& get_flag_locations();
         const std::vector<std::vector<Cover>>& get_visible_map();
         const std::vector<std::vector<std::string>> get_state_map();
         
