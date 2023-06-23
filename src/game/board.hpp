@@ -36,6 +36,8 @@ namespace GameLogic {
         bool done {};
         bool started {};
 
+        std::vector<std::pair<std::pair<int, int>, int>> most_recent_changes {};
+
         // the Mersenne Twister is used for randomness
         std::mt19937 g { std::random_device{}() };
 
