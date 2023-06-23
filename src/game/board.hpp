@@ -36,8 +36,6 @@ namespace GameLogic {
         bool done {};
         bool started {};
 
-        std::vector<std::pair<std::pair<int, int>, int>> most_recent_changes {};
-
         // the Mersenne Twister is used for randomness
         std::mt19937 g { std::random_device{}() };
 
@@ -45,6 +43,7 @@ namespace GameLogic {
         std::vector<std::vector<Cover>> visible_map {};
         std::unordered_set<int> mine_locations {};
         std::vector<std::pair<int, int>> flag_locations {};
+        std::vector<std::pair<std::pair<int, int>, int>> most_recent_changes {};
 
         // returns all surrounding coordinates to the input position
         const std::vector<std::pair<int, int>> get_surrounding_positions(int x, int y);
