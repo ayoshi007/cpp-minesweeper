@@ -15,8 +15,8 @@ namespace GameLogic {
 
     }
     Board::Board(int w, int h, int mines, int mt_seed) :
-        flags { 0 }, 
-        correct_flags { 0 },
+        flag_count { 0 }, 
+        correct_flag_count { 0 },
         lost { false },
         done { false },
         started { false },
@@ -30,8 +30,8 @@ namespace GameLogic {
         set_board(w, h, mines);
     }
     Board::Board(int w, int h, int mines) :
-        flags { 0 }, 
-        correct_flags { 0 },
+        flag_count { 0 }, 
+        correct_flag_count { 0 },
         lost { false },
         done { false },
         started { false },
@@ -48,15 +48,15 @@ namespace GameLogic {
     bool Board::is_game_lost() { return lost; }
     bool Board::is_game_done() { return done; }
     bool Board::is_game_started() { return started; }
-    int Board::get_flag_count() { return flags; }
+    int Board::get_flag_count() { return flag_count; }
     int Board::get_mine_count() { return mine_count; }
-    int Board::get_correct_flags() { return correct_flags; }
+    int Board::get_correct_flag_count() { return correct_flag_count; }
     /**
      * Clears the board's state back to default values
     */
     void Board::clear_board() {
-        flags = 0;
-        correct_flags = 0;
+        flag_count = 0;
+        correct_flag_count = 0;
         width = 0;
         height = 0;
         mine_count = 0;
@@ -334,9 +334,9 @@ namespace GameLogic {
             // covered locations may be flagged
             case Cover::Covered:
                 visible_map[x][y] = Cover::Flagged;
-                flags++;
+                flag_count++;
                 if (map[x][y] == -1) {
-                    correct_flags++;
+                    correct_flag_count++;
                 }
                 break;
             case Cover::Uncovered:
@@ -344,13 +344,13 @@ namespace GameLogic {
             // flagged locations may be unflagged
             case Cover::Flagged:
                 visible_map[x][y] = Cover::Covered;
-                flags--;
+                flag_count--;
                 if (map[x][y] == -1) {
-                    correct_flags--;
+                    correct_flag_count--;
                 }
                 break;
         }
-        done = correct_flags == mine_count;
+        done = correct_flag_count == mine_count;
         return done;
     }
 }

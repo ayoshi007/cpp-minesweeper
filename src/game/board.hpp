@@ -30,8 +30,8 @@ namespace GameLogic {
         int width;
         int height {};
         int mine_count {};
-        int flags {};
-        int correct_flags {};
+        int flag_count {};
+        int correct_flag_count {};
         bool lost {};
         bool done {};
         bool started {};
@@ -67,10 +67,10 @@ namespace GameLogic {
         bool is_game_started();
         int get_flag_count();
         int get_mine_count();
-        int get_correct_flags();
+        int get_correct_flag_count();
         void clear_board();
         void set_board(int w, int h, int mines);
-                
+
         const std::vector<std::vector<int>>& get_map();
         const std::unordered_set<int>& get_mine_locations();
         const std::unordered_set<int>& get_flag_locations();
