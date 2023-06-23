@@ -25,33 +25,44 @@ namespace GameLogic {
         board = Board(width, height, mine_count);
         return true;
     }
-    std::vector<std::pair<std::pair<int, int>, int>> BoardController::select(int x, int y) {
-        if (x < 0 || x >= board.get_height()) {
-            throw "Cannot accept negative arguments";
-        }
-        if (y < 0 || y >= board.get_width()) {
-            throw "Cannot accept negative arguments";
+    bool BoardController::select(int x, int y) {
+        if (x < 0 || x >= board.get_height() || y < 0 || y >= board.get_width()) {
+            throw "Bad x, y arguments";
         }
         if (board.is_game_done()) {
-            throw "Game is over";
+            throw "Game is finished";
         }
-        board.select(x, y);
-        return {};
+        return board.select(x, y);
     }
     bool BoardController::flag(int x, int y) {
-        if (x < 0 || x >= board.get_height()) {
-            throw "Cannot accept negative arguments";
-        }
-        if (y < 0 || y >= board.get_width()) {
-            throw "Cannot accept negative arguments";
+        if (x < 0 || x >= board.get_height() || y < 0 || y >= board.get_width()) {
+            throw "Bad x, y arguments";
         }
         if (board.is_game_done()) {
-            throw "Game is over";
+            throw "Game is finished";
         }
         return board.flag(x, y);
     }
     int BoardController::get_flag_count()  {
         return board.get_flag_count();
+    }
+    std::vector<std::pair<std::pair<int, int>, int>> BoardController::get_mine_locations() {
+        if (!board.is_game_lost()) {
+            throw "Game is not lost";
+        }
+        return {};
+    }
+    std::vector<std::pair<std::pair<int, int>, int>> BoardController::get_incorrect_flags() {
+        if (!board.is_game_lost()) {
+            throw "Game is not lost";
+        }
+        return {};
+    }
+    std::vector<std::pair<std::pair<int, int>, int>> BoardController::get_changes() {
+        if (board.is_game_lost()) {
+            throw "Game has been lost";
+        }
+        return {};
     }
 }
 
