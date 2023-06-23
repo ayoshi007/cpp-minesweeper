@@ -19,12 +19,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-
+    
+    # Install latest CMake and Ninja
+    - uses: lukka/get-cmake@latest
+    
+    # Runs the build script in the project TLD
+    # Uses Ninja for the build generator
     - name: Run build script
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: ${{github.workspace}}/build.sh -GNinja
-
+    
+    # Runs registered unit tests with CTest
     - name: Test
       working-directory: ${{github.workspace}}/build/debug/tests
       # Execute tests defined by the CMake configuration.
