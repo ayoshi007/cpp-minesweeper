@@ -8,7 +8,7 @@ do
 done
 
 if [[ -z "${GENERATOR}" ]] ; then
-    GENERATOR="Unix Makefiles"
+    GENERATOR="Ninja"
 fi
 
 if [[ -z "${BUILD_TYPE}" ]] ; then
@@ -29,11 +29,15 @@ BUILD_DIR=`echo ${BUILD_TYPE} | tr A-Z a-z`
 
 command=(cmake -S . -B build)
 
-echo "===Options==="
+echo "=== Options ==="
 echo "Generator (-G):" "${GENERATOR}"
 echo "Build type (-B):" "${BUILD_TYPE}"
 echo "Enable testing (-T):" "${CPPMS_ENABLE_TESTING}"
 echo
 
-cmake -S . -B build/"${BUILD_DIR}" -G "${GENERATOR}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" -DCPPMS_ENABLE_TESTING="${CPPMS_ENABLE_TESTING}" -DFTXUI_BUILD_EXAMPLES=OFF -DFTXUI_BUILD_TESTS=OFF
+cmake -S . -B build/"${BUILD_DIR}" -G "${GENERATOR}" \
+    -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
+    -DCPPMS_ENABLE_TESTING="${CPPMS_ENABLE_TESTING}" \
+    -DFTXUI_BUILD_EXAMPLES=OFF \
+    -DFTXUI_BUILD_TESTS=OFF
 cmake --build build/"${BUILD_DIR}"
