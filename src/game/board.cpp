@@ -149,32 +149,32 @@ namespace GameLogic {
      * Output:
      *  a vector of coordinate pairs of all cells surrounding x and y
     */
-    const std::vector<std::pair<int, int>> Board::get_surrounding_positions(int x, int y) {
+    const std::vector<std::pair<int, int>> Board::get_surrounding_positions(int r, int c) {
         std::vector<std::pair<int, int>> surrounding_positions;
         
-        if (x != 0) {
-            if (y != 0) {
-                surrounding_positions.push_back(std::pair<int, int> {x - 1, y - 1});
+        if (r != 0) {
+            if (c != 0) {
+                surrounding_positions.push_back(std::pair<int, int> {r - 1, c - 1});
             }
-            if (y != width - 1) {
-                surrounding_positions.push_back(std::pair<int, int> {x - 1, y + 1});
+            if (c != width - 1) {
+                surrounding_positions.push_back(std::pair<int, int> {r - 1, c + 1});
             }
-            surrounding_positions.push_back(std::pair<int, int> {x - 1, y});
+            surrounding_positions.push_back(std::pair<int, int> {r - 1, c});
         }
-        if (x != height - 1) {
-            if (y != 0) {
-                surrounding_positions.push_back(std::pair<int, int> {x + 1, y - 1});
+        if (r != height - 1) {
+            if (c != 0) {
+                surrounding_positions.push_back(std::pair<int, int> {r + 1, c - 1});
             }
-            if (y != width - 1) {
-                surrounding_positions.push_back(std::pair<int, int> {x + 1, y + 1});
+            if (c != width - 1) {
+                surrounding_positions.push_back(std::pair<int, int> {r + 1, c + 1});
             }
-            surrounding_positions.push_back(std::pair<int, int> {x + 1, y});
+            surrounding_positions.push_back(std::pair<int, int> {r + 1, c});
         }
-        if (y != 0) {
-            surrounding_positions.push_back(std::pair<int, int> {x, y - 1});
+        if (c != 0) {
+            surrounding_positions.push_back(std::pair<int, int> {r, c - 1});
         }
-        if (y != width - 1) {
-            surrounding_positions.push_back(std::pair<int, int> {x, y + 1});
+        if (c != width - 1) {
+            surrounding_positions.push_back(std::pair<int, int> {r, c + 1});
         }
 
         return surrounding_positions;
@@ -205,7 +205,7 @@ namespace GameLogic {
      * Output
      *  A boolean indicating whether or not a mine was uncovered
     */
-    bool Board::uncover_surroundings(int x, int y) {
+    bool Board::uncover_surroundings(int r, int c) {
         // static int count = 0;
         // count++;
         // if (count > 100) {
@@ -213,19 +213,19 @@ namespace GameLogic {
         // }
 
         // mines are uncovered and stop uncovering (returns true)
-        if (map[x][y] == -1) {
-            visible_map[x][y] = Cover::Uncovered;
+        if (map[r][c] == -1) {
+            visible_map[r][c] = Cover::Uncovered;
             return true;
         }
         bool mine_detonated = false;
-        const std::vector<std::pair<int, int>> surrounding_positions = get_surrounding_positions(x, y);
+        const std::vector<std::pair<int, int>> surrounding_positions = get_surrounding_positions(r, c);
 
         // uncover Covered cells
-        if (visible_map[x][y] == Cover::Covered) {
-            visible_map[x][y] = Cover::Uncovered;
+        if (visible_map[r][c] == Cover::Covered) {
+            visible_map[r][c] = Cover::Uncovered;
             // cells with a value 0 will uncover their surroundings recursively
             // note that cells with a value greater than 0 will only uncover themselves
-            if (map[x][y] == 0) {
+            if (map[r][c] == 0) {
                 //std::cout << "Uncovering all around r = " << x << ", c = " << y << '\n';
                 for (auto pos: surrounding_positions) {
                     // recursive call
@@ -234,13 +234,13 @@ namespace GameLogic {
             }
         }
         // Uncovered cells that have a value greater than 0 may be used to uncover surroundings
-        else if (map[x][y] != 0) {
+        else if (map[r][c] != 0) {
             //std::cout << "Checking flags around r = " << x << ", c = " << y << '\n';
 
             // if the cell's value equals the number of surrounding cells that are flagged, and
             //  there are uncovered cells surrounding the cell, then uncover the surrounding cells recursively
             std::unordered_map<Cover, int> visibilties = get_visibilities(surrounding_positions);
-            if (visibilties[Cover::Covered] > 0 && visibilties[Cover::Flagged] == map[x][y]) {
+            if (visibilties[Cover::Covered] > 0 && visibilties[Cover::Flagged] == map[r][c]) {
                 //std::cout << "Uncovering around r = " << x << ", c = " << y << '\n';
                 for (auto pos: surrounding_positions) {
                     mine_detonated |= select(pos.first, pos.second);
@@ -281,23 +281,23 @@ namespace GameLogic {
      * Output:
      *  a boolean describing whether or not a mine was detonated
     */
-    bool Board::select(int x, int y) {
+    bool Board::select(int r, int c) {
         // if this call to select() is a first move, make sure it doesn't cause a game over
         if (!started) {
             started = true;
             // if the first selected position is a mine position, swap it with a free position and then proceed with the rest of the function
-            if (map[x][y] == -1) {
+            if (map[r][c] == -1) {
                 // find a free position, and the surrounding positions of the selected and free position
                 std::pair<int, int> free_pos = find_free_pos();
-                std::vector<std::pair<int, int>> old_spot_surroundings = get_surrounding_positions(x, y);
+                std::vector<std::pair<int, int>> old_spot_surroundings = get_surrounding_positions(r, c);
                 std::vector<std::pair<int, int>> new_spot_surroundings = get_surrounding_positions(free_pos.first, free_pos.second);
 
                 // make the selected position a free position
-                map[x][y] = 0;
-                mine_locations.erase(x * width + y);
+                map[r][c] = 0;
+                mine_locations.erase(r * width + c);
                 for (auto pos: old_spot_surroundings) {
                     if (map[pos.first][pos.second] == -1) {
-                        map[x][y]++;
+                        map[r][c]++;
                     } else {
                         map[pos.first][pos.second] = std::max(map[pos.first][pos.second] - 1, 0);
                     }
@@ -312,10 +312,10 @@ namespace GameLogic {
         }
         // allow selection for covered and uncovered locations
         // flagged locations cannot be selected
-        switch(visible_map[x][y]) {
+        switch(visible_map[r][c]) {
             case Cover::Covered:
             case Cover::Uncovered:
-                lost = uncover_surroundings(x, y);
+                lost = uncover_surroundings(r, c);
             case Cover::Flagged:
                 break;
         }
