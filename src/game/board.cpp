@@ -383,15 +383,21 @@ TEST_SUITE("Board object") {
             b.select(0, 0);
             b.flag(0, 0);
             CHECK(b.get_visible_map()[0][0] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_flag_count() == 0);
+            CHECK(b.get_flag_locations().size() == 0);
         }
         SUBCASE("Flag covered position") {
             b.flag(0, 0);
             CHECK(b.get_visible_map()[0][0] == GameLogic::Board::Cover::Flagged);
+            CHECK(b.get_flag_count() == 1);
+            CHECK(b.get_flag_locations().size() == 1);
         }
         SUBCASE("Flag flagged position") {
             b.flag(0, 0);
             b.flag(0, 0);
             CHECK(b.get_visible_map()[0][0] == GameLogic::Board::Cover::Covered);
+            CHECK(b.get_flag_count() == 0);
+            CHECK(b.get_flag_locations().size() == 0);
         }
         SUBCASE("Flag all mines") {
             bool allFlagged = false;
@@ -399,6 +405,9 @@ TEST_SUITE("Board object") {
                 allFlagged = b.flag(loc / b.get_width(), loc % b.get_width());
             }
             CHECK(allFlagged == true);
+            CHECK(b.get_correct_flag_count() == b.get_mine_count());
+            CHECK(b.get_flag_locations().size() == b.get_correct_flag_count());
+            CHECK(b.get_flag_locations().size() == b.get_mine_count());
             if (!allFlagged) {
                 MESSAGE("Displaying board and player board");
                 print_map(b.get_map());
@@ -457,6 +466,7 @@ TEST_SUITE("Board object") {
             b.select(0, 0);
             CHECK(b.get_visible_map()[1][0] == GameLogic::Board::Cover::Uncovered);
             CHECK(b.get_visible_map()[1][1] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_correct_flag_count() == 1);
         }
         SUBCASE("Select uncovered position without equal number of flags around it") {
             b.select(0, 0);
