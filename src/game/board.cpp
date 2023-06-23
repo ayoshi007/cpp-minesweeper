@@ -138,6 +138,9 @@ namespace GameLogic {
     const std::unordered_set<int>& Board::get_mine_locations() {
         return mine_locations;
     }
+    const std::unordered_set<int>& Board::get_flag_locations() {
+        return flag_locations;
+    }
     /**
      * Input:
      *  x - the row of the cell
