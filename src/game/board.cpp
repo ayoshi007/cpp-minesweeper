@@ -14,8 +14,19 @@ namespace GameLogic {
     Board::Board(int mt_seed) : Board{constants::DEFAULT_CUSTOM_W, constants::DEFAULT_CUSTOM_H, constants::SMALL_BOARD_MINES, mt_seed} {
 
     }
-    Board::Board(int w, int h, int mines, int mt_seed) : Board{w, h, mines} {
+    Board::Board(int w, int h, int mines, int mt_seed) :
+        flags { 0 }, 
+        correct_flags { 0 },
+        lost { false },
+        done { false },
+        started { false },
+        map {},
+        visible_map {},
+        mine_locations {},
+        flag_locations {}
+        {
         g.seed(mt_seed);
+        set_board(w, h, mines);
     }
     Board::Board(int w, int h, int mines) :
         flags { 0 }, 
@@ -83,7 +94,7 @@ namespace GameLogic {
             // mines are given a value of -1
             map[r][c] = -1;
             visible_map[r][c] = Cover::Covered;
-            mine_locations.insert(i);
+            mine_locations.insert(mine_pos);
             // increments the values of all positions surrounding the mine
             const std::vector<std::pair<int, int>> surrounding_positions = get_surrounding_positions(r, c);
             for (auto pos: surrounding_positions) {
@@ -342,9 +353,116 @@ namespace GameLogic {
     }
 }
 
-TEST_CASE("testing Board object creation") {
-    GameLogic::Board b {5, 5, 10};
-    CHECK(b.get_width() == 5);
-    CHECK(b.get_height() == 5);
-    CHECK(b.get_mine_count() == 10);
+template <typename T>
+void print_map(const std::vector<std::vector<T>>& map) {
+    for (auto row: map) {
+        for (auto col: row) {
+            std::cout << col << '\t';
+        }
+        std::cout << '\n';
+    }
+}
+
+TEST_SUITE("Board object") {
+    TEST_CASE("Board object creation") {
+        GameLogic::Board b {5, 5, 10};
+        CHECK(b.get_width() == 5);
+        CHECK(b.get_height() == 5);
+        CHECK(b.get_mine_count() == 10);
+    }
+    TEST_CASE("Flagging") {
+        GameLogic::Board b {8, 8, 10, 5};
+        SUBCASE("Flag uncovered position") {
+            b.select(0, 0);
+            b.flag(0, 0);
+            CHECK(b.get_visible_map()[0][0] == GameLogic::Board::Cover::Uncovered);
+        }
+        SUBCASE("Flag covered position") {
+            b.flag(0, 0);
+            CHECK(b.get_visible_map()[0][0] == GameLogic::Board::Cover::Flagged);
+        }
+        SUBCASE("Flag flagged position") {
+            b.flag(0, 0);
+            b.flag(0, 0);
+            CHECK(b.get_visible_map()[0][0] == GameLogic::Board::Cover::Covered);
+        }
+        SUBCASE("Flag all mines") {
+            bool allFlagged = false;
+            for (int loc: b.get_mine_locations()) {
+                allFlagged = b.flag(loc / b.get_width(), loc % b.get_width());
+            }
+            CHECK(allFlagged == true);
+            if (!allFlagged) {
+                MESSAGE("Displaying board and player board");
+                print_map(b.get_map());
+                print_map(b.get_state_map());
+            }
+        }
+    }
+    
+    TEST_CASE("Selecting") {
+        GameLogic::Board b {8, 8, 10, 5};
+        MESSAGE("Displaying map");
+        print_map(b.get_map());
+        SUBCASE("First select mine location") {
+            bool gameOver = b.select(1, 2);
+            CHECK(gameOver == false);
+            if (gameOver) {
+                MESSAGE("Displaying visible board");
+                print_map(b.get_state_map());
+            }
+        }
+        SUBCASE("Non mine location") {
+            bool gameOver = b.select(0, 4);
+            CHECK(gameOver == false);
+            if (gameOver) {
+                MESSAGE("Displaying visible board");
+                print_map(b.get_state_map());
+            }
+        }
+        SUBCASE("Mine location after first select") {
+            b.select(0, 4);
+            bool gameOver = b.select(1, 2);
+            CHECK(gameOver == true);
+            if (!gameOver) {
+                MESSAGE("Displaying visible board");
+                print_map(b.get_state_map());
+            }
+        }
+        SUBCASE("Select position with 0 mines around it") {
+            b.select(0, 5);
+            CHECK(b.get_visible_map()[0][4] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[0][5] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[0][6] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[0][7] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[1][4] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[1][5] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[1][6] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[1][7] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[2][4] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[2][5] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[2][6] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[2][7] == GameLogic::Board::Cover::Uncovered);
+        }
+        SUBCASE("Select uncovered position with equal number of flags around it") {
+            b.select(0, 0);
+            b.flag(0, 1);
+            b.select(0, 0);
+            CHECK(b.get_visible_map()[1][0] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[1][1] == GameLogic::Board::Cover::Uncovered);
+        }
+        SUBCASE("Select uncovered position without equal number of flags around it") {
+            b.select(0, 0);
+            b.select(0, 0);
+            CHECK(b.get_visible_map()[0][1] == GameLogic::Board::Cover::Covered);
+            CHECK(b.get_visible_map()[1][0] == GameLogic::Board::Cover::Covered);
+            CHECK(b.get_visible_map()[1][1] == GameLogic::Board::Cover::Covered);
+        }
+        SUBCASE("Select uncovered position with equal number of flags at incorrect positions") {
+            b.select(0, 0);
+            b.flag(1, 0);
+            bool gameOver = b.select(0, 0);
+            CHECK(gameOver == true);
+        }
+    }
 }
