@@ -332,13 +332,14 @@ namespace GameLogic {
      *  whether or not the number of correct flags are equal to the mine count
      *      (i.e. if the game has been won)
     */
-    bool Board::flag(int x, int y) {
-        switch (visible_map[x][y]) {
+    bool Board::flag(int r, int c) {
+        switch (visible_map[r][c]) {
             // covered locations may be flagged
             case Cover::Covered:
-                visible_map[x][y] = Cover::Flagged;
+                visible_map[r][c] = Cover::Flagged;
                 flag_count++;
-                if (map[x][y] == -1) {
+                flag_locations.insert(r * width + c);
+                if (map[r][c] == -1) {
                     correct_flag_count++;
                 }
                 break;
@@ -346,9 +347,10 @@ namespace GameLogic {
                 break;
             // flagged locations may be unflagged
             case Cover::Flagged:
-                visible_map[x][y] = Cover::Covered;
+                visible_map[r][c] = Cover::Covered;
                 flag_count--;
-                if (map[x][y] == -1) {
+                flag_locations.erase(r * width + c);
+                if (map[r][c] == -1) {
                     correct_flag_count--;
                 }
                 break;
