@@ -5,6 +5,9 @@ namespace GameLogic {
     BoardController::BoardController() : board {} {
 
     }
+    bool BoardController::initialize_board(int width, int height, int mine_count, int seed) {
+        
+    }
     bool BoardController::initialize_board(int width, int height, int mine_count) {
         if (width <= 0 || height <= 0 || mine_count <= 0) {
             throw "Cannot accept negative arguments";
