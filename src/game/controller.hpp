@@ -24,11 +24,11 @@ namespace GameLogic {
         int get_flag_count();
 
         // called in the event of a game over from a select
-        std::vector<std::pair<std::pair<int, int>, int>> get_mine_locations();
-        std::vector<std::pair<std::pair<int, int>, int>> get_incorrect_flags();
+        const std::unordered_set<int>& get_mine_locations();
+        std::unordered_set<int> get_incorrect_flags();
 
         // called after a successful select
-        std::vector<std::pair<std::pair<int, int>, int>> get_changes();
+        const std::vector<std::tuple<int, int, int>>& get_changes();
     };
 }
 

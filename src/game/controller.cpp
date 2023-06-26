@@ -46,23 +46,29 @@ namespace GameLogic {
     int BoardController::get_flag_count()  {
         return board.get_flag_count();
     }
-    std::vector<std::pair<std::pair<int, int>, int>> BoardController::get_mine_locations() {
+    const std::unordered_set<int>& BoardController::get_mine_locations() {
         if (!board.is_game_lost()) {
             throw "Game is not lost";
         }
-        return {};
+        return board.get_mine_locations();
     }
-    std::vector<std::pair<std::pair<int, int>, int>> BoardController::get_incorrect_flags() {
+    std::unordered_set<int> BoardController::get_incorrect_flags() {
         if (!board.is_game_lost()) {
             throw "Game is not lost";
         }
-        return {};
+        std::unordered_set<int> incorrect_flags;
+        for (int flag: board.get_flag_locations()) {
+            if (board.get_mine_locations().find(flag) == board.get_mine_locations().end()) {
+                incorrect_flags.insert(flag);
+            }
+        }
+        return incorrect_flags;
     }
-    std::vector<std::pair<std::pair<int, int>, int>> BoardController::get_changes() {
+    const std::vector<std::tuple<int, int, int>>& BoardController::get_changes() {
         if (board.is_game_lost()) {
             throw "Game has been lost";
         }
-        return {};
+        return board.get_most_recent_changes();
     }
 }
 
