@@ -43,13 +43,14 @@ namespace GameLogic {
         std::vector<std::vector<Cover>> visible_map {};
         std::unordered_set<int> mine_locations {};
         std::unordered_set<int> flag_locations {};
-        std::vector<std::pair<std::pair<int, int>, int>> most_recent_changes {};
+        std::vector<std::tuple<int, int, int>> most_recent_changes {};
 
         // returns all surrounding coordinates to the input position
         const std::vector<std::pair<int, int>> get_surrounding_positions(int x, int y);
         // returns the number of each Cover given a vector of positions
         std::unordered_map<Cover, int> get_visibilities(const std::vector<std::pair<int, int>>& surrounding_positions);
-        // helper function for select
+        // helper functions for select()
+        bool select_helper(int x, int y);
         bool uncover_surroundings(int x, int y);
         // randomly finds an unmined position
         std::pair<int, int> find_free_pos();
@@ -76,6 +77,7 @@ namespace GameLogic {
         const std::unordered_set<int>& get_flag_locations();
         const std::vector<std::vector<Cover>>& get_visible_map();
         const std::vector<std::vector<std::string>> get_state_map();
+        const std::vector<std::tuple<int, int, int>>& get_most_recent_changes();
         
         bool select(int x, int y);
         bool flag(int x, int y);

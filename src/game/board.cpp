@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <unordered_map>
+#include <tuple>
 #include <string>
 #include <numeric>
 #include <algorithm>
@@ -141,6 +142,9 @@ namespace GameLogic {
     const std::unordered_set<int>& Board::get_flag_locations() {
         return flag_locations;
     }
+    const std::vector<std::tuple<int, int, int>>& Board::get_most_recent_changes() {
+        return most_recent_changes;
+    }
     /**
      * Input:
      *  x - the row of the cell
@@ -197,7 +201,7 @@ namespace GameLogic {
         return counts;
     }
     /**
-     * A helper function used by select()
+     * A helper function used by select_helper()
      * Will recursively uncover the visible map according to what value is at row x, column y
      * Input:
      *  x - the row to uncover
@@ -206,14 +210,9 @@ namespace GameLogic {
      *  A boolean indicating whether or not a mine was uncovered
     */
     bool Board::uncover_surroundings(int r, int c) {
-        // static int count = 0;
-        // count++;
-        // if (count > 100) {
-        //     std::exit(1);
-        // }
-
         // mines are uncovered and stop uncovering (returns true)
         if (map[r][c] == -1) {
+            most_recent_changes.push_back({r, c, -1});
             visible_map[r][c] = Cover::Uncovered;
             return true;
         }
@@ -222,28 +221,25 @@ namespace GameLogic {
 
         // uncover Covered cells
         if (visible_map[r][c] == Cover::Covered) {
+            most_recent_changes.push_back({r, c, map[r][c]});
             visible_map[r][c] = Cover::Uncovered;
             // cells with a value 0 will uncover their surroundings recursively
             // note that cells with a value greater than 0 will only uncover themselves
             if (map[r][c] == 0) {
-                //std::cout << "Uncovering all around r = " << x << ", c = " << y << '\n';
                 for (auto pos: surrounding_positions) {
                     // recursive call
-                    mine_detonated |= select(pos.first, pos.second);
+                    mine_detonated |= select_helper(pos.first, pos.second);
                 }
             }
         }
         // Uncovered cells that have a value greater than 0 may be used to uncover surroundings
         else if (map[r][c] != 0) {
-            //std::cout << "Checking flags around r = " << x << ", c = " << y << '\n';
-
             // if the cell's value equals the number of surrounding cells that are flagged, and
             //  there are uncovered cells surrounding the cell, then uncover the surrounding cells recursively
             std::unordered_map<Cover, int> visibilties = get_visibilities(surrounding_positions);
             if (visibilties[Cover::Covered] > 0 && visibilties[Cover::Flagged] == map[r][c]) {
-                //std::cout << "Uncovering around r = " << x << ", c = " << y << '\n';
                 for (auto pos: surrounding_positions) {
-                    mine_detonated |= select(pos.first, pos.second);
+                    mine_detonated |= select_helper(pos.first, pos.second);
                 }
             }
         }
@@ -271,16 +267,6 @@ namespace GameLogic {
         std::pair<int, int> free_pos {positions[i] / width, positions[i] % width};
         return free_pos;
     }
-    /**
-     * Selects the cell at row x, column y.
-     * Will guarantee that the first selected cell in the board does not cause a game over.
-     * Returns whether or not the select move caused a mine to detonate.
-     * Input:
-     *  x - the row to select
-     *  y - the column to select
-     * Output:
-     *  a boolean describing whether or not a mine was detonated
-    */
     bool Board::select(int r, int c) {
         // if this call to select() is a first move, make sure it doesn't cause a game over
         if (!started) {
@@ -310,6 +296,20 @@ namespace GameLogic {
                 }
             }
         }
+        most_recent_changes.clear();
+        return select_helper(r, c);
+    }
+    /**
+     * Selects the cell at row x, column y.
+     * Will guarantee that the first selected cell in the board does not cause a game over.
+     * Returns whether or not the select_helper move caused a mine to detonate.
+     * Input:
+     *  x - the row to select
+     *  y - the column to select
+     * Output:
+     *  a boolean describing whether or not a mine was detonated
+    */
+    bool Board::select_helper(int r, int c) {
         // allow selection for covered and uncovered locations
         // flagged locations cannot be selected
         switch(visible_map[r][c]) {
@@ -418,8 +418,10 @@ TEST_SUITE("Board object") {
     
     TEST_CASE("Selecting") {
         GameLogic::Board b {8, 8, 10, 5};
+        /*
         MESSAGE("Displaying map");
         print_map(b.get_map());
+        */
         SUBCASE("First select mine location") {
             bool gameOver = b.select(1, 2);
             CHECK(gameOver == false);
@@ -435,6 +437,7 @@ TEST_SUITE("Board object") {
                 MESSAGE("Displaying visible board");
                 print_map(b.get_state_map());
             }
+            CHECK(b.get_most_recent_changes().size() == 1);
         }
         SUBCASE("Mine location after first select") {
             b.select(0, 4);
@@ -447,18 +450,12 @@ TEST_SUITE("Board object") {
         }
         SUBCASE("Select position with 0 mines around it") {
             b.select(0, 5);
-            CHECK(b.get_visible_map()[0][4] == GameLogic::Board::Cover::Uncovered);
-            CHECK(b.get_visible_map()[0][5] == GameLogic::Board::Cover::Uncovered);
-            CHECK(b.get_visible_map()[0][6] == GameLogic::Board::Cover::Uncovered);
-            CHECK(b.get_visible_map()[0][7] == GameLogic::Board::Cover::Uncovered);
-            CHECK(b.get_visible_map()[1][4] == GameLogic::Board::Cover::Uncovered);
-            CHECK(b.get_visible_map()[1][5] == GameLogic::Board::Cover::Uncovered);
-            CHECK(b.get_visible_map()[1][6] == GameLogic::Board::Cover::Uncovered);
-            CHECK(b.get_visible_map()[1][7] == GameLogic::Board::Cover::Uncovered);
-            CHECK(b.get_visible_map()[2][4] == GameLogic::Board::Cover::Uncovered);
-            CHECK(b.get_visible_map()[2][5] == GameLogic::Board::Cover::Uncovered);
-            CHECK(b.get_visible_map()[2][6] == GameLogic::Board::Cover::Uncovered);
-            CHECK(b.get_visible_map()[2][7] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_most_recent_changes().size() == 18);
+            const std::vector<std::tuple<int, int, int>> changes = b.get_most_recent_changes();
+            for (auto change: changes) {
+                CHECK(b.get_visible_map()[std::get<0>(change)][std::get<1>(change)] == GameLogic::Board::Cover::Uncovered);
+                CHECK(b.get_map()[std::get<0>(change)][std::get<1>(change)] == std::get<2>(change));
+            }
         }
         SUBCASE("Select uncovered position with equal number of flags around it") {
             b.select(0, 0);
@@ -467,6 +464,7 @@ TEST_SUITE("Board object") {
             CHECK(b.get_visible_map()[1][0] == GameLogic::Board::Cover::Uncovered);
             CHECK(b.get_visible_map()[1][1] == GameLogic::Board::Cover::Uncovered);
             CHECK(b.get_correct_flag_count() == 1);
+            CHECK(b.get_most_recent_changes().size() == 2);
         }
         SUBCASE("Select uncovered position without equal number of flags around it") {
             b.select(0, 0);
@@ -474,12 +472,14 @@ TEST_SUITE("Board object") {
             CHECK(b.get_visible_map()[0][1] == GameLogic::Board::Cover::Covered);
             CHECK(b.get_visible_map()[1][0] == GameLogic::Board::Cover::Covered);
             CHECK(b.get_visible_map()[1][1] == GameLogic::Board::Cover::Covered);
+            CHECK(b.get_most_recent_changes().empty());
         }
         SUBCASE("Select uncovered position with equal number of flags at incorrect positions") {
             b.select(0, 0);
             b.flag(1, 0);
             bool gameOver = b.select(0, 0);
             CHECK(gameOver == true);
+            CHECK(b.get_most_recent_changes().size() == 2);
         }
     }
 }
