@@ -8,20 +8,22 @@
 
 using namespace ftxui;
 
-std::string GameUI::MainMenu::subtitle = "Main menu";
-// Component GameUI::MainMenu::small_board_button = Button("Small (8x8, 10 mines)", , ButtonOption::Animated());
-// Component GameUI::MainMenu::medium_board_button = Button("Medium (16x16, 40 mines)", , ButtonOption::Animated());
-// Component GameUI::MainMenu::large_board_button = Button("Large (32x16, 99 mines)", , ButtonOption::Animated());
+namespace GameUI {
+    std::string MainMenu::subtitle = "Main menu";
+    // Component MainMenu::small_board_button = Button("Small (8x8, 10 mines)", , ButtonOption::Animated());
+    // Component MainMenu::medium_board_button = Button("Medium (16x16, 40 mines)", , ButtonOption::Animated());
+    // Component MainMenu::large_board_button = Button("Large (32x16, 99 mines)", , ButtonOption::Animated());
 
-GameUI::MainMenu::MainMenu() :
-    custom_board_menu_shown {false},
-    width_slider_value { constants::DEFAULT_CUSTOM_W },
-    height_slider_value { constants::DEFAULT_CUSTOM_H },
-    mine_percent_slider_value { constants::DEFAULT_CUSTOM_PERCENT }
-    {
+    MainMenu::MainMenu() :
+        custom_board_menu_shown {false},
+        width_slider_value { constants::DEFAULT_CUSTOM_W },
+        height_slider_value { constants::DEFAULT_CUSTOM_H },
+        mine_percent_slider_value { constants::DEFAULT_CUSTOM_PERCENT }
+        {
 
-}
+    }
 
-std::string GameUI::MainMenu::get_subtitle() {
-    return subtitle;
+    std::string MainMenu::get_subtitle() {
+        return subtitle;
+    }
 }

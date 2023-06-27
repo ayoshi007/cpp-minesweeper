@@ -8,48 +8,50 @@
 
 using namespace ftxui;
 
-std::string GameUI::Window::title = "TUI Minesweeper";
-std::string GameUI::Window::current_subtitle = "Subtitle";
-int GameUI::Window::board_width = constants::DEFAULT_CUSTOM_W;
-int GameUI::Window::board_height = constants::DEFAULT_CUSTOM_H;
-int GameUI::Window::board_mine_count = constants::SMALL_BOARD_MINES;
-bool GameUI::Window::quit_modal_shown = false;
-int GameUI::Window::shown_screen = constants::MAIN_MENU_SCREEN;
-ScreenInteractive GameUI::Window::screen = ScreenInteractive::TerminalOutput();
-Component GameUI::Window::quit_button = Button(
-    "Quit",
-    [] { quit_modal_shown = true; },
-    ButtonOption::Ascii()
-    );
-
-void GameUI::Window::start() {
-    current_subtitle = GameUI::MainMenu::get_subtitle();
-    Component quit_modal = GameUI::ModalPromptBuilder::build(
-        "Quit?",
-        GameUI::Window::screen.ExitLoopClosure(),
-        [](){ GameUI::Window::quit_modal_shown = false; }
+namespace GameUI {
+    std::string Window::title = "TUI Minesweeper";
+    std::string Window::current_subtitle = "Subtitle";
+    int Window::board_width = constants::DEFAULT_CUSTOM_W;
+    int Window::board_height = constants::DEFAULT_CUSTOM_H;
+    int Window::board_mine_count = constants::SMALL_BOARD_MINES;
+    bool Window::quit_modal_shown = false;
+    int Window::shown_screen = constants::MAIN_MENU_SCREEN;
+    ScreenInteractive Window::screen = ScreenInteractive::TerminalOutput();
+    Component Window::quit_button = Button(
+        "Quit",
+        [] { quit_modal_shown = true; },
+        ButtonOption::Ascii()
         );
-    Component window_bar_renderer = Renderer(quit_button, [](){
-        return hbox({
-            build_text_element(GameUI::Window::title) | center,
-            separator(),
-            build_text_element(current_subtitle) | flex,
-            GameUI::Window::quit_button->Render()
+
+    void Window::start() {
+        current_subtitle = MainMenu::get_subtitle();
+        Component quit_modal = ModalPromptBuilder::build(
+            "Quit?",
+            Window::screen.ExitLoopClosure(),
+            [](){ Window::quit_modal_shown = false; }
+            );
+        Component window_bar_renderer = Renderer(quit_button, [](){
+            return hbox({
+                build_text_element(Window::title) | center,
+                separator(),
+                build_text_element(current_subtitle) | flex,
+                Window::quit_button->Render()
+            });
         });
-    });
-    //Component tabs = Container::Tab
-    Component main_component = Container::Vertical({
-        window_bar_renderer
-    });
-    Component main_renderer = Renderer(main_component, [&](){
-        return vbox({
-            main_component->Render()
+        //Component tabs = Container::Tab
+        Component main_component = Container::Vertical({
+            window_bar_renderer
         });
-    })
-    | Modal(quit_modal, &quit_modal_shown)
-    | border;
-    screen.Loop(main_renderer);
-}
-void GameUI::Window::show_main_menu() {
-    GameUI::Window::shown_screen = constants::MAIN_MENU_SCREEN;
+        Component main_renderer = Renderer(main_component, [&](){
+            return vbox({
+                main_component->Render()
+            });
+        })
+        | Modal(quit_modal, &quit_modal_shown)
+        | border;
+        screen.Loop(main_renderer);
+    }
+    void Window::show_main_menu() {
+        Window::shown_screen = constants::MAIN_MENU_SCREEN;
+    }
 }
