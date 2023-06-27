@@ -29,6 +29,10 @@ namespace GameLogic {
 
         // called after a successful select
         const std::vector<std::tuple<int, int, int>>& get_changes();
+
+        // debugging
+        const std::vector<std::vector<std::string>> get_state_map();
+        const std::vector<std::vector<int>>& get_map();
     };
 }
 

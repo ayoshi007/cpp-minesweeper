@@ -1,5 +1,6 @@
 #include <doctest/doctest.h>
 #include <core/constants.hpp>
+#include "helper.hpp"
 
 #include <iostream>
 #include <unordered_map>
@@ -360,16 +361,6 @@ namespace GameLogic {
     }
 }
 
-template <typename T>
-void print_map(const std::vector<std::vector<T>>& map) {
-    for (auto row: map) {
-        for (auto col: row) {
-            std::cout << col << '\t';
-        }
-        std::cout << '\n';
-    }
-}
-
 TEST_SUITE("Board object") {
     TEST_CASE("Board object creation") {
         GameLogic::Board b {5, 5, 10};
@@ -425,6 +416,8 @@ TEST_SUITE("Board object") {
         SUBCASE("First select mine location") {
             bool gameOver = b.select(1, 2);
             CHECK(gameOver == false);
+            CHECK(b.is_game_lost() == false);
+            CHECK(b.is_game_done() == false);
             if (gameOver) {
                 MESSAGE("Displaying visible board");
                 print_map(b.get_state_map());
@@ -433,6 +426,8 @@ TEST_SUITE("Board object") {
         SUBCASE("Non mine location") {
             bool gameOver = b.select(0, 4);
             CHECK(gameOver == false);
+            CHECK(b.is_game_lost() == false);
+            CHECK(b.is_game_done() == false);
             if (gameOver) {
                 MESSAGE("Displaying visible board");
                 print_map(b.get_state_map());
@@ -443,6 +438,8 @@ TEST_SUITE("Board object") {
             b.select(0, 4);
             bool gameOver = b.select(1, 2);
             CHECK(gameOver == true);
+            CHECK(b.is_game_lost() == true);
+            CHECK(b.is_game_done() == true);
             if (!gameOver) {
                 MESSAGE("Displaying visible board");
                 print_map(b.get_state_map());
@@ -480,6 +477,8 @@ TEST_SUITE("Board object") {
             bool gameOver = b.select(0, 0);
             CHECK(gameOver == true);
             CHECK(b.get_most_recent_changes().size() == 2);
+            CHECK(b.is_game_lost() == true);
+            CHECK(b.is_game_done() == true);
         }
     }
 }

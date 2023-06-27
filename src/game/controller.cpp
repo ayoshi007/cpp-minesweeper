@@ -1,6 +1,7 @@
 #include <doctest/doctest.h>
 #include <game/controller.hpp>
 #include <game/board.hpp>
+#include "helper.hpp"
 
 namespace GameLogic {
     BoardController::BoardController() {
@@ -65,10 +66,17 @@ namespace GameLogic {
         return incorrect_flags;
     }
     const std::vector<std::tuple<int, int, int>>& BoardController::get_changes() {
-        if (board.is_game_lost()) {
-            throw "Game has been lost";
+        if (board.is_game_done()) {
+            throw "Game is finished";
         }
         return board.get_most_recent_changes();
+    }
+
+    const std::vector<std::vector<std::string>> BoardController::get_state_map() {
+        return board.get_state_map();
+    }
+    const std::vector<std::vector<int>>& BoardController::get_map() {
+        return board.get_map();
     }
 }
 
@@ -92,5 +100,63 @@ TEST_SUITE("Board controller") {
                 CHECK_THROWS(controller.initialize_board(8, 8, 64));
             }
         }
+    }
+    TEST_CASE("Selecting/flagging") {
+        GameLogic::BoardController controller;
+        controller.initialize_board(5, 5, 5, 5);
+        MESSAGE("Displaying board");
+        print_map(controller.get_map());
+        SUBCASE("Bad select") {
+            CHECK_THROWS(controller.select(-1, -1));
+        }
+        SUBCASE("Bad flag") {
+            CHECK_THROWS(controller.flag(-1, -1));
+        }
+        SUBCASE("Selecting after loss") {
+            controller.select(0, 1);
+            bool gameOver = controller.select(2, 0);
+            CHECK(gameOver == true);
+            CHECK_THROWS(controller.select(0, 0));
+        }
+        SUBCASE("Flagging after loss") {
+            controller.select(0, 1);
+            controller.select(2, 0);
+            CHECK_THROWS(controller.flag(0, 0));
+        }
+    }
+    TEST_CASE("Winning game") {
+        GameLogic::BoardController controller;
+        controller.initialize_board(5, 5, 5, 5);
+        MESSAGE("Displaying board");
+        print_map(controller.get_map());
+        CHECK_THROWS(controller.get_incorrect_flags());
+        CHECK_THROWS(controller.get_mine_locations());
+        CHECK_NOTHROW(controller.get_changes());
+        controller.flag(0, 1);
+        controller.flag(1, 4);
+        controller.flag(2, 0);
+        controller.flag(2, 2);
+        controller.flag(3, 4);
+        CHECK_THROWS(controller.get_incorrect_flags());
+        CHECK_THROWS(controller.get_mine_locations());
+        CHECK_THROWS(controller.select(0, 0));
+        CHECK_THROWS(controller.flag(0, 0));
+        CHECK_THROWS(controller.get_changes());
+    }
+    TEST_CASE("Losing game") {
+        GameLogic::BoardController controller;
+        controller.initialize_board(5, 5, 5, 5);
+        MESSAGE("Displaying board");
+        print_map(controller.get_map());
+        CHECK_THROWS(controller.get_incorrect_flags());
+        CHECK_THROWS(controller.get_mine_locations());
+        CHECK_NOTHROW(controller.get_changes());
+        controller.select(0, 1);
+        controller.select(1, 4);
+        CHECK_NOTHROW(controller.get_incorrect_flags());
+        CHECK_NOTHROW(controller.get_mine_locations());
+        CHECK_THROWS(controller.select(0, 0));
+        CHECK_THROWS(controller.flag(0, 0));
+        CHECK_THROWS(controller.get_changes());
     }
 }
