@@ -123,6 +123,14 @@ TEST_SUITE("Board controller") {
             controller.select(2, 0);
             CHECK_THROWS(controller.flag(0, 0));
         }
+        SUBCASE("Incorrect flag counts") {
+            controller.select(0, 1);
+            controller.flag(0, 0);
+            controller.select(2, 0);
+            std::unordered_set<int> incorrect_flags = controller.get_incorrect_flags();
+            CHECK(incorrect_flags.size() == 1);
+            CHECK(incorrect_flags.find(0) != incorrect_flags.end());
+        }
     }
     TEST_CASE("Winning game") {
         GameLogic::BoardController controller;
