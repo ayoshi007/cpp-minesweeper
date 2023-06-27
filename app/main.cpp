@@ -1,5 +1,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include <doctest/doctest.h>
+
+#include <core/starter.hpp>
 #include <ui/window.hpp>
 
 #include <iostream>
@@ -10,6 +12,6 @@ Start game by using game.cpp
 */
 
 int main() {
-    GameUI::Window::start();
+    start_game();
     return 0;
 }
