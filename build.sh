@@ -27,11 +27,11 @@ if [[ -z "${CPPMS_ENABLE_TESTING}" ]] ; then
     fi
 fi
 
-#if [[ -z "${CPPMS_RUN_UI_TESTS}" ]] ; then
-#    CPPMS_RUN_UI_TESTS=OFF
-#elif [[ "${CPPMS_ENABLE_TESTING}" = "OFF" ]] ; then
-#    CPPMS_RUN_UI_TESTS=OFF
-#fi
+if [[ -z "${CPPMS_RUN_UI_TESTS}" ]] ; then
+    CPPMS_RUN_UI_TESTS=OFF
+elif [[ "${CPPMS_ENABLE_TESTING}" = "OFF" ]] ; then
+    CPPMS_RUN_UI_TESTS=OFF
+fi
 
 
 BUILD_DIR=`echo ${BUILD_TYPE} | tr A-Z a-z`

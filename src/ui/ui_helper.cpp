@@ -33,10 +33,19 @@ namespace GameUI {
 #ifdef RUN_UI_TESTS
 TEST_SUITE("UI helper functions") {
     ScreenInteractive screen = ScreenInteractive::TerminalOutput();
+    TEST_CASE("Build text element") {
+        MESSAGE("Text element builder test");
+        Element text_element = GameUI::build_text_element("Text element");
+        Component renderer = Renderer([&] () {
+            return text_element;
+        })
+        | border;
+        screen.Loop(renderer);
+    }
     TEST_CASE("Build modal prompt") {
         MESSAGE("Modal prompt builder interactive test");
         bool show_modal = false;
-        Component show_modal_button = Button("Show modal", [&show_modal] { show_modal = true; });
+        Component show_modal_button = Button("Show modal", [&show_modal] { show_modal = true; }, ButtonOption::Ascii());
         Component modal_comp = GameUI::build_modal_prompt("End test?", screen.ExitLoopClosure(), [&show_modal] { show_modal = false; });
         Component renderer = Renderer(show_modal_button, [&] () {
             return show_modal_button->Render();
