@@ -13,13 +13,13 @@
 using namespace ftxui;
 
 namespace GameUI {
-    std::function<Element(std::string, int)> Builder::slider_label = [] (std::string label_text, int value) {
+    std::function<Element(std::string, int)> PartsBuilder::slider_label = [] (std::string label_text, int value) {
         return text(label_text + std::to_string(value));
     };
-    Component Builder::build_slider(std::string label_text, int* value, int min, int max, int increment) {
+    Component PartsBuilder::build_slider(std::string label_text, int* value, int min, int max, int increment) {
         return Slider(label_text, Ref(value), ConstRef(min), ConstRef(max), ConstRef(increment));
     }
-    Component Builder::build_modal_prompt(const std::string& prompt, std::function<void()> yes_op, std::function<void()> no_op) {
+    Component PartsBuilder::build_modal_prompt(const std::string& prompt, std::function<void()> yes_op, std::function<void()> no_op) {
         return Container::Vertical({
             Button("Yes", yes_op, ButtonOption::Animated()),
             Button("No", no_op, ButtonOption::Animated())
@@ -34,7 +34,7 @@ namespace GameUI {
         });
     }
     
-    Element Builder::build_text_element(const std::string& str) {
+    Element PartsBuilder::build_text_element(const std::string& str) {
         return text(str);
     }
 }
@@ -44,7 +44,7 @@ TEST_SUITE("UI helper functions") {
     ScreenInteractive screen = ScreenInteractive::TerminalOutput();
     TEST_CASE("Build text element") {
         MESSAGE("Text element builder test");
-        Element text_element = GameUI::Builder::build_text_element("Text element");
+        Element text_element = GameUI::PartsBuilder::build_text_element("Text element");
         Component renderer = Renderer([&] () {
             return text_element;
         })
@@ -55,7 +55,7 @@ TEST_SUITE("UI helper functions") {
         MESSAGE("Modal prompt builder interactive test");
         bool show_modal = false;
         Component show_modal_button = Button("Show modal", [&show_modal] { show_modal = true; }, ButtonOption::Ascii());
-        Component modal_comp = GameUI::Builder::build_modal_prompt("End test?", screen.ExitLoopClosure(), [&show_modal] { show_modal = false; });
+        Component modal_comp = GameUI::PartsBuilder::build_modal_prompt("End test?", screen.ExitLoopClosure(), [&show_modal] { show_modal = false; });
         Component renderer = Renderer(show_modal_button, [&] () {
             return show_modal_button->Render();
         })
@@ -70,11 +70,11 @@ TEST_SUITE("UI helper functions") {
         int max = 100;
         int increment = 1;
         std::string label_text = "Value: ";
-        Component slider = GameUI::Builder::build_slider("", &value, min, max, increment);
+        Component slider = GameUI::PartsBuilder::build_slider("", &value, min, max, increment);
         Component container = Container::Vertical({slider});
         Component renderer = Renderer(container, [&] () {
             return hbox(
-                {GameUI::Builder::slider_label(label_text, value), slider->Render()}
+                {GameUI::PartsBuilder::slider_label(label_text, value), slider->Render()}
             );
         })
         | border;

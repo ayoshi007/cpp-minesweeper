@@ -16,7 +16,7 @@ namespace GameUI {
         static bool quit_modal_shown;
         static int shown_screen;
 
-        static MainMenu main_menu_components;
+        static MainMenuBuilder main_menu_components;
         static GameBoard game_board_components;
 
         static ftxui::Component quit_button;

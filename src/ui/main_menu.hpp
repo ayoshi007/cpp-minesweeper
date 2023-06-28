@@ -6,7 +6,7 @@
 
 
 namespace GameUI {
-    class MainMenu {
+    class MainMenuBuilder {
         private:
         static std::string subtitle;
 

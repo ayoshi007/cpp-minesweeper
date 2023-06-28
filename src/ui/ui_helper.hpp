@@ -9,9 +9,7 @@
 
 
 namespace GameUI {
-    class Builder {
-        
-
+    class PartsBuilder {
         public:
         static ftxui::Component build_modal_prompt(const std::string& prompt, std::function<void()> yes_op, std::function<void()> no_op);
         static ftxui::Element build_text_element(const std::string& str);

@@ -24,17 +24,17 @@ namespace GameUI {
         );
 
     void Window::start() {
-        current_subtitle = MainMenu::get_subtitle();
-        Component quit_modal = Builder::build_modal_prompt(
+        current_subtitle = MainMenuBuilder::get_subtitle();
+        Component quit_modal = PartsBuilder::build_modal_prompt(
             "Quit?",
             Window::screen.ExitLoopClosure(),
             [](){ Window::quit_modal_shown = false; }
             );
         Component window_bar_renderer = Renderer(quit_button, [](){
             return hbox({
-                Builder::build_text_element(Window::title) | center,
+                PartsBuilder::build_text_element(Window::title) | center,
                 separator(),
-                Builder::build_text_element(current_subtitle) | flex,
+                PartsBuilder::build_text_element(current_subtitle) | flex,
                 Window::quit_button->Render()
             });
         });
