@@ -34,9 +34,10 @@ namespace GameUI {
 TEST_SUITE("UI helper functions") {
     ScreenInteractive screen = ScreenInteractive::TerminalOutput();
     TEST_CASE("Build modal prompt") {
+        MESSAGE("Modal prompt builder interactive test");
         bool show_modal = false;
         Component show_modal_button = Button("Show modal", [&show_modal] { show_modal = true; });
-        Component modal_comp = GameUI::build_modal_prompt("End test?", [] { screen.ExitLoopClosure(); }, [&show_modal] { show_modal = false; });
+        Component modal_comp = GameUI::build_modal_prompt("End test?", screen.ExitLoopClosure(), [&show_modal] { show_modal = false; });
         Component renderer = Renderer(show_modal_button, [&] () {
             return show_modal_button->Render();
         })
