@@ -19,6 +19,7 @@ FetchContent_MakeAvailable(doctest)
 # ------------------------
 
 option(CPPMS_ENABLE_TESTING "Build unit tests" ON)
+option(CPPMS_RUN_UI_TESTS "Build interactive UI tests" OFF)
 
 # set(FTXUI_BUILD_EXAMPLES OFF)
 # set(FTXUI_BUILD_TESTS OFF)

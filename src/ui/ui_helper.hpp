@@ -7,10 +7,7 @@
 
 
 namespace GameUI {
-    class ModalPromptBuilder {
-        public:
-        static ftxui::Component build(const std::string& prompt, std::function<void()> yes_op, std::function<void()> no_op);
-    };
+    ftxui::Component build_modal_prompt(const std::string& prompt, std::function<void()> yes_op, std::function<void()> no_op);
     ftxui::Element build_text_element(const std::string& str);
 }
 

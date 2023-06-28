@@ -25,7 +25,7 @@ namespace GameUI {
 
     void Window::start() {
         current_subtitle = MainMenu::get_subtitle();
-        Component quit_modal = ModalPromptBuilder::build(
+        Component quit_modal = GameUI::build_modal_prompt(
             "Quit?",
             Window::screen.ExitLoopClosure(),
             [](){ Window::quit_modal_shown = false; }

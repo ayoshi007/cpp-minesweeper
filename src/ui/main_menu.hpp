@@ -14,13 +14,11 @@ namespace GameUI {
         int width_slider_value;
         int height_slider_value;
         int mine_percent_slider_value;
- 
+
         public:
         static std::string get_subtitle();
 
-        MainMenu();
-        // Component build_main_menu_renderer(const std::string& label, std::function<void()> action);
-        // Component build_slider_and_label(int value)
+        static ftxui::Component build_main_menu_renderer();
     };
 }
 
