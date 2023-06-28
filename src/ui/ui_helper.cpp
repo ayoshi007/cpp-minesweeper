@@ -18,9 +18,7 @@ namespace GameUI {
     };
     Component Builder::build_slider(std::string label_text, int* value, int min, int max, int increment) {
         return Slider(label_text, Ref(value), ConstRef(min), ConstRef(max), ConstRef(increment));
-        //return {slider_label(label_text, value), slider->Render()};
     }
-
     Component Builder::build_modal_prompt(const std::string& prompt, std::function<void()> yes_op, std::function<void()> no_op) {
         return Container::Vertical({
             Button("Yes", yes_op, ButtonOption::Animated()),
@@ -65,7 +63,7 @@ TEST_SUITE("UI helper functions") {
         | border;
         screen.Loop(renderer);
     }
-    TEST_CASE("Test slider label builders") {
+    TEST_CASE("Test individual slider label builders") {
         MESSAGE("Slider builder and label builder interactive test");
         int value = 50;
         int min = 4;
