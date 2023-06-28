@@ -37,6 +37,7 @@ BUILD_DIR=`echo ${BUILD_TYPE} | tr A-Z a-z`
 
 command=(cmake -S . -B build)
 
+# CPPMS_RUN_UI_TESTS not working
 echo "=== Options ==="
 echo "Generator (-G):" "${GENERATOR}"
 echo "Build type (-B):" "${BUILD_TYPE}"
