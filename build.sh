@@ -1,10 +1,11 @@
-while getopts "G:B:T:U" flag
-do
+while getopts "G:B:T:U:h" flag ; do
     case "${flag}" in
-        G) GENERATOR=${OPTARG};;
-        B) BUILD_TYPE=${OPTARG};;
-        T) CPPMS_ENABLE_TESTING=${OPTARG};;
-        U) CPPMS_RUN_UI_TESTS=${OPTARG};;
+        G) GENERATOR="${OPTARG}";;
+        B) BUILD_TYPE="${OPTARG}";;
+        T) CPPMS_ENABLE_TESTING="${OPTARG}";;
+        U) CPPMS_RUN_UI_TESTS="${OPTARG}";;
+        h) echo "Usage: ./build.sh [-G <Ninja|\"Unix Makefiles\">] [-B <Debug|Release>] [-T <ON|OFF>] [-U <ON|OFF>]" && exit;;
+        ?) echo "Usage: ./build.sh [-G <Ninja|\"Unix Makefiles\">] [-B <Debug|Release>] [-T <ON|OFF>] [-U <ON|OFF>]";;
     esac
 done
 
@@ -17,20 +18,20 @@ if [[ -z "${BUILD_TYPE}" ]] ; then
 fi
 
 if [[ -z "${CPPMS_ENABLE_TESTING}" ]] ; then
-    if [[ "$BUILD_TYPE" = "Debug" ]] ; then
+    if [[ "${BUILD_TYPE}" = "Debug" ]] ; then
         CPPMS_ENABLE_TESTING=ON
-    elif [[ "$BUILD_TYPE" = "Release" ]] ; then
+    elif [[ "${BUILD_TYPE}" = "Release" ]] ; then
         CPPMS_ENABLE_TESTING=OFF
     else
         CPPMS_ENABLE_TESTING=OFF
     fi
 fi
 
-if [[ -z "${CPPMS_RUN_UI_TESTS}" ]] ; then
-    CPPMS_RUN_UI_TESTS=OFF
-elif [[ "${CPPMS_ENABLE_TESTING}" = "OFF" ]] ; then
-    CPPMS_RUN_UI_TESTS=OFF
-fi
+#if [[ -z "${CPPMS_RUN_UI_TESTS}" ]] ; then
+#    CPPMS_RUN_UI_TESTS=OFF
+#elif [[ "${CPPMS_ENABLE_TESTING}" = "OFF" ]] ; then
+#    CPPMS_RUN_UI_TESTS=OFF
+#fi
 
 
 BUILD_DIR=`echo ${BUILD_TYPE} | tr A-Z a-z`

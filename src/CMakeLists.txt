@@ -31,3 +31,6 @@ target_link_libraries(my_minesweeper_obj
 )
 target_compile_features(my_minesweeper_obj PUBLIC cxx_std_11)
 target_compile_options(my_minesweeper_obj PUBLIC -Wall -Wextra -Wpedantic -Werror)
+if (CPPMS_RUN_UI_TESTS)
+    add_compile_definitions(RUN_UI_TESTS)
+endif()
