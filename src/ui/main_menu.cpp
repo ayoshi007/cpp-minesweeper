@@ -24,18 +24,21 @@ namespace GameUI {
     int MainMenuBuilder::height_slider_value = constants::DEFAULT_CUSTOM_H;
     int MainMenuBuilder::mine_percent_slider_value = constants::DEFAULT_CUSTOM_PERCENT;
 
-    // Component MainMenuBuilder::small_board_button = Button("Small (8x8, 10 mines)", , ButtonOption::Animated());
-    // Component MainMenuBuilder::medium_board_button = Button("Medium (16x16, 40 mines)", , ButtonOption::Animated());
-    // Component MainMenuBuilder::large_board_button = Button("Large (32x16, 99 mines)", , ButtonOption::Animated());
     int MainMenuBuilder::get_width_slider_value() { return width_slider_value; }
     int MainMenuBuilder::get_height_slider_value() { return height_slider_value; }
     int MainMenuBuilder::get_mine_percent_slider_value() { return mine_percent_slider_value; }
+    /**
+     * Builds the modal menu for creating a custom board
+    */
     Component MainMenuBuilder::build_custom_board_modal(std::function<void()> custom_board_action) {
+        // create sliders
         Component width_slider = GameUI::PartsBuilder::build_slider("", &width_slider_value, 4, 100, 1);
         Component height_slider = GameUI::PartsBuilder::build_slider("", &height_slider_value, 4, 100, 1);
         Component mine_percent_slider_slider = GameUI::PartsBuilder::build_slider("", &mine_percent_slider_value, 1, 99, 1);
+        // create buttons to start the game or quit the modal
         Component custom_board_start = Button("Start", custom_board_action, ButtonOption::Animated());
         Component custom_board_quit = Button("Back", []{ MainMenuBuilder::custom_board_menu_shown = false; }, ButtonOption::Animated());
+        // create and return the renderer for the modal menu
         return Container::Vertical({
             width_slider,
             height_slider,
@@ -60,16 +63,20 @@ namespace GameUI {
             | border | bgcolor(Color::Black);// | size(WIDTH, GREATER_THAN, screen.dimx() / 5);
         });
     }
+    /**
+     * Builds the main menu's grid of buttons
+    */
     Component MainMenuBuilder::build_main_menu_buttons(
         std::function<void()> small_board_action,
         std::function<void()> med_board_action,
         std::function<void()> large_board_action
     ) {
+        // create buttons
         Component small_board_button = Button("Small board (8x8, 10 mines)", small_board_action, ButtonOption::Animated());
         Component med_board_button = Button("Medium board (16x16, 40 mines)", med_board_action, ButtonOption::Animated());
         Component large_board_button = Button("Large board (30x16, 99 mines)", large_board_action, ButtonOption::Animated());
         Component custom_board_button = Button("Custom board", [] { MainMenuBuilder::custom_board_menu_shown = true; }, ButtonOption::Animated());
-        // main menu component container
+        // create and return the renderer for the buttons
         return Container::Vertical({
             Container::Horizontal({
                 small_board_button,
@@ -98,8 +105,11 @@ namespace GameUI {
         std::function<void()> large_board_action,
         std::function<void()> custom_board_action
     ) {
+        // get the modal menu
         Component custom_board_modal = build_custom_board_modal(custom_board_action);
+        // get the buttons
         Component main_menu_buttons = build_main_menu_buttons(small_board_action, med_board_action, large_board_action);
+        // attach the modal menu to the buttons
         main_menu_buttons |= Modal(custom_board_modal, &custom_board_menu_shown);
         return main_menu_buttons;
     }
