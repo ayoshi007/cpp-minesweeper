@@ -15,8 +15,6 @@ namespace GameUI {
         static std::string large_button_text;
         static std::string custom_button_text;
 
-
-        static bool custom_board_menu_shown;
         static int width_slider_value;
         static int height_slider_value;
         static int mine_percent_slider_value;
@@ -29,6 +27,10 @@ namespace GameUI {
         );
 
         public:
+        static bool custom_board_menu_shown;
+        static int get_width_slider_value();
+        static int get_height_slider_value();
+        static int get_mine_percent_slider_value();
         static std::string get_subtitle();
 
         static ftxui::Component build_main_menu_renderer(

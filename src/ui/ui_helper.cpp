@@ -41,8 +41,8 @@ namespace GameUI {
 
 #ifdef RUN_UI_TESTS
 TEST_SUITE("UI helper functions") {
-    ScreenInteractive screen = ScreenInteractive::TerminalOutput();
     TEST_CASE("Build text element") {
+        ScreenInteractive screen = ScreenInteractive::TerminalOutput();
         MESSAGE("Text element builder test");
         Element text_element = GameUI::PartsBuilder::build_text_element("Text element");
         Component renderer = Renderer([&] () {
@@ -52,6 +52,7 @@ TEST_SUITE("UI helper functions") {
         screen.Loop(renderer);
     }
     TEST_CASE("Build modal prompt") {
+        ScreenInteractive screen = ScreenInteractive::TerminalOutput();
         MESSAGE("Modal prompt builder interactive test");
         bool show_modal = false;
         Component show_modal_button = Button("Show modal", [&show_modal] { show_modal = true; }, ButtonOption::Ascii());
@@ -64,6 +65,7 @@ TEST_SUITE("UI helper functions") {
         screen.Loop(renderer);
     }
     TEST_CASE("Test individual slider label builders") {
+        ScreenInteractive screen = ScreenInteractive::TerminalOutput();
         MESSAGE("Slider builder and label builder interactive test");
         int value = 50;
         int min = 4;
