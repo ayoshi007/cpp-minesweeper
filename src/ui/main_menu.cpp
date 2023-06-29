@@ -20,7 +20,12 @@ namespace GameUI {
     // Component MainMenuBuilder::small_board_button = Button("Small (8x8, 10 mines)", , ButtonOption::Animated());
     // Component MainMenuBuilder::medium_board_button = Button("Medium (16x16, 40 mines)", , ButtonOption::Animated());
     // Component MainMenuBuilder::large_board_button = Button("Large (32x16, 99 mines)", , ButtonOption::Animated());
-
+    Component MainMenuBuilder::build_main_menu_renderer() {
+        return nullptr;
+    }
+    Component MainMenuBuilder::build_main_menu_buttons() {
+        return nullptr;
+    }
 
     std::string MainMenuBuilder::get_subtitle() {
         return subtitle;

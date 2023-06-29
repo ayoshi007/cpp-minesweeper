@@ -15,6 +15,9 @@ namespace GameUI {
         static int height_slider_value;
         static int mine_percent_slider_value;
 
+        static ftxui::Component build_custom_board_modal();
+        static ftxui::Component build_main_menu_buttons();
+
         public:
         static std::string get_subtitle();
 
