@@ -8,7 +8,9 @@
 
 namespace GameUI {
     class GameBoard {
+        private:
         GameLogic::BoardController board_controller;
+        
     };
 }
 
