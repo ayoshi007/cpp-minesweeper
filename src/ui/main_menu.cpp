@@ -12,6 +12,11 @@ using namespace ftxui;
 
 namespace GameUI {
     std::string MainMenuBuilder::subtitle = "Main menu";
+    std::string small_button_text = "Small board (8x8, 10 mines)";
+    std::string med_button_text = "Medium board (16x16, 40 mines)";
+    std::string large_button_text = "Large board (30x16, 99 mines)";
+    std::string custom_button_text = "Custom board";
+    
     bool MainMenuBuilder::custom_board_menu_shown = false;
     int MainMenuBuilder::width_slider_value = constants::DEFAULT_CUSTOM_W;
     int MainMenuBuilder::height_slider_value = constants::DEFAULT_CUSTOM_H;
@@ -20,18 +25,27 @@ namespace GameUI {
     // Component MainMenuBuilder::small_board_button = Button("Small (8x8, 10 mines)", , ButtonOption::Animated());
     // Component MainMenuBuilder::medium_board_button = Button("Medium (16x16, 40 mines)", , ButtonOption::Animated());
     // Component MainMenuBuilder::large_board_button = Button("Large (32x16, 99 mines)", , ButtonOption::Animated());
-    Component MainMenuBuilder::build_custom_board_modal() {
+    Component MainMenuBuilder::build_custom_board_modal(std::function<void()> custom_board_action) {
         return nullptr;
     }
-    Component MainMenuBuilder::build_main_menu_buttons() {
+    Component MainMenuBuilder::build_main_menu_buttons(
+        std::function<void()> small_board_action,
+        std::function<void()> med_board_action,
+        std::function<void()> large_board_action
+    ) {
         return nullptr;
     }
 
     std::string MainMenuBuilder::get_subtitle() {
         return subtitle;
     }
-    Component MainMenuBuilder::build_main_menu_renderer() {
-        return nullptr;
+    Component MainMenuBuilder::build_main_menu_renderer(
+        std::function<void()> small_board_action,
+        std::function<void()> med_board_action,
+        std::function<void()> large_board_action,
+        std::function<void()> custom_board_action
+    ) {
+        Component main_menu_buttons = build_main_menu_buttons(small_board_action, med_board_action, large_board_action);
     }
 }
 
