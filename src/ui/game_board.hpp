@@ -24,8 +24,8 @@ namespace GameUI {
     };
     class GameBoard {
         private:
-        int mx;
-        int my;
+        int mx {};
+        int my {};
         GameLogic::BoardController board_controller;
         std::vector<std::vector<BoardCell>> game_board;
 
@@ -38,7 +38,7 @@ namespace GameUI {
         public:
         static GameUI::GameBoard build_side_bar(std::function<void()> return_to_menu_action);
     };
-    
+
 }
 
 #endif // GAME_BOARD_HPP

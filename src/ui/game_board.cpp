@@ -14,7 +14,11 @@
 using namespace ftxui;
 
 namespace GameUI {
-    
+    GameUI::GameBoard::GameBoard(int width, int height, int mine_count) : 
+        board_controller {width, height, mine_count}
+        {
+
+    }
 }
 
 #ifdef RUN_UI_TESTS

@@ -27,7 +27,7 @@ namespace GameLogic {
             Flagged
         };
         private:
-        int width;
+        int width {};
         int height {};
         int mine_count {};
         int flag_count {};
