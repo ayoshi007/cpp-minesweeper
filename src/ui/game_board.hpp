@@ -30,7 +30,7 @@ namespace GameUI {
         
         public:
         static ftxui::Component build_container();
-        static GmaeUI::GameBoard build_game_board_ui(int width, int height, int mine_count);
+        static GameUI::GameBoard build_game_board_ui(int width, int height, int mine_count);
 
     };
 }
