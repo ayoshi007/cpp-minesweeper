@@ -72,10 +72,10 @@ namespace GameUI {
         std::function<void()> large_board_action
     ) {
         // create buttons
-        Component small_board_button = Button("Small board (8x8, 10 mines)", small_board_action, ButtonOption::Animated());
-        Component med_board_button = Button("Medium board (16x16, 40 mines)", med_board_action, ButtonOption::Animated());
-        Component large_board_button = Button("Large board (30x16, 99 mines)", large_board_action, ButtonOption::Animated());
-        Component custom_board_button = Button("Custom board", [] { MainMenuBuilder::custom_board_menu_shown = true; }, ButtonOption::Animated());
+        Component small_board_button = Button(constants::SMALL_BOARD_BUTTON_LABEL, small_board_action, ButtonOption::Animated());
+        Component med_board_button = Button(constants::MED_BOARD_BUTTON_LABEL, med_board_action, ButtonOption::Animated());
+        Component large_board_button = Button(constants::LARGE_BOARD_BUTTON_LABEL, large_board_action, ButtonOption::Animated());
+        Component custom_board_button = Button(constants::CUSTOM_BOARD_BUTTON_LABEL, [] { MainMenuBuilder::custom_board_menu_shown = true; }, ButtonOption::Animated());
         // create and return the renderer for the buttons
         return Container::Vertical({
             Container::Horizontal({
