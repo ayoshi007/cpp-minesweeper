@@ -11,6 +11,7 @@
 #include <ftxui/component/component_options.hpp>
 #include <ftxui/dom/canvas.hpp>
 
+using namespace ftxui;
 
 #ifdef RUN_UI_TESTS
 TEST_SUITE("Game board builder functions") {
