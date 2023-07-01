@@ -13,6 +13,10 @@
 
 using namespace ftxui;
 
+namespace GameUI {
+    
+}
+
 #ifdef RUN_UI_TESTS
 TEST_SUITE("Game board builder functions") {
     TEST_CASE("Interactive game board test" * doctest::skip()) {

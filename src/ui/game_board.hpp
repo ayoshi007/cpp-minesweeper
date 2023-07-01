@@ -24,19 +24,21 @@ namespace GameUI {
     };
     class GameBoard {
         private:
+        int mx;
+        int my;
         GameLogic::BoardController board_controller;
         std::vector<std::vector<BoardCell>> game_board;
-        static ftxui::Element flag_mine_label;
+        ftxui::Element flag_mine_label;
 
-        static GameUI::GameBoard build_side_bar();
-        
         public:
-        static GameUI::GameBoard build_game_board_ui(
-            int width, int height, int mine_count,
-            std::function<void()> return_to_menu_action
-        );
-
+        GameBoard(int width, int height, int mine_count);
     };
+    class GameSideBar {
+        private:
+
+        public:
+        static GameUI::GameBoard build_side_bar(std::function<void()> return_to_menu_action);
+    }
 }
 
 #endif // GAME_BOARD_HPP
