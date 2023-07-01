@@ -38,7 +38,7 @@ namespace GameUI {
 
         public:
         static GameUI::GameBoard build_side_bar(std::function<void()> return_to_menu_action);
-    }
+    };
 }
 
 #endif // GAME_BOARD_HPP
