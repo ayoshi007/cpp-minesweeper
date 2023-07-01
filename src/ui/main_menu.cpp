@@ -12,13 +12,7 @@ using namespace ftxui;
 
 namespace GameUI {
     std::string MainMenuBuilder::subtitle = "Main menu";
-    /*
-    std::string small_button_text = ;
-    std::string med_button_text = ;
-    std::string large_button_text = ;
-    std::string custom_button_text = ;
-    */
-
+    
     bool MainMenuBuilder::custom_board_menu_shown = false;
     int MainMenuBuilder::width_slider_value = constants::DEFAULT_CUSTOM_W;
     int MainMenuBuilder::height_slider_value = constants::DEFAULT_CUSTOM_H;

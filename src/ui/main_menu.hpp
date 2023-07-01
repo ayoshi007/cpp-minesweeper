@@ -10,10 +10,10 @@ namespace GameUI {
         private:
         static std::string subtitle;
 
-        static std::string small_button_text;
-        static std::string med_button_text;
-        static std::string large_button_text;
-        static std::string custom_button_text;
+        static std::function<void()> small_board_button_action;
+        static std::function<void()> med_board_button_action;
+        static std::function<void()> large_board_button_action;
+        static std::function<void()> custom_board_button_action;
 
         static int width_slider_value;
         static int height_slider_value;
