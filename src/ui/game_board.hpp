@@ -18,18 +18,20 @@ namespace GameUI {
     struct BoardCell {
         int row;
         int col;
-        ftxui::Color toggle_color;
-        ftxui::Color def_color;
-        ftxui::Color outline_color;
-        bool toggle;
+        ftxui::Color border_color;
+        ftxui::Color fill_color;
         ftxui::Component renderer;
     };
     class GameBoard {
         private:
         GameLogic::BoardController board_controller;
         std::vector<std::vector<BoardCell>> game_board;
+        static ftxui::Component container;
         
-        
+        public:
+        static ftxui::Component build_container();
+        static GmaeUI::GameBoard build_game_board_ui(int width, int height, int mine_count);
+
     };
 }
 
