@@ -26,11 +26,15 @@ namespace GameUI {
         private:
         GameLogic::BoardController board_controller;
         std::vector<std::vector<BoardCell>> game_board;
-        static ftxui::Component container;
+        static ftxui::Element flag_mine_label;
+
+        static GameUI::GameBoard build_side_bar();
         
         public:
-        static ftxui::Component build_container();
-        static GameUI::GameBoard build_game_board_ui(int width, int height, int mine_count);
+        static GameUI::GameBoard build_game_board_ui(
+            int width, int height, int mine_count,
+            std::function<void()> return_to_menu_action
+        );
 
     };
 }
