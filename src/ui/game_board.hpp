@@ -28,7 +28,6 @@ namespace GameUI {
         int my;
         GameLogic::BoardController board_controller;
         std::vector<std::vector<BoardCell>> game_board;
-        ftxui::Element flag_mine_label;
 
         public:
         GameBoard(int width, int height, int mine_count);
@@ -39,6 +38,7 @@ namespace GameUI {
         public:
         static GameUI::GameBoard build_side_bar(std::function<void()> return_to_menu_action);
     };
+    
 }
 
 #endif // GAME_BOARD_HPP
