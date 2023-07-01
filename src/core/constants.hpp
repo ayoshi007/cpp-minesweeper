@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
+#include <string>
+
 namespace constants {
     extern const int SMALL_BOARD_W;
     extern const int SMALL_BOARD_H;
