@@ -21,14 +21,25 @@ namespace GameUI {
         ftxui::Color border_color;
         ftxui::Color fill_color;
         ftxui::Component renderer;
+        GameLogic::Board::Cover cover;
     };
     class GameBoard {
         private:
+        int width {};
+        int height {};
         int mx {};
         int my {};
+        int selected_row {};
+        int selected_col {};
+        int mine_count {};
+        int canvas_dimension {};
         GameLogic::BoardController board_controller;
         std::vector<std::vector<BoardCell>> game_board;
+        ftxui::Component container;
+        ftxui::Component renderer;
 
+        void initialize_cells();
+        void initialize_renderer();
         public:
         GameBoard(int width, int height, int mine_count);
     };
