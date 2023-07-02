@@ -148,6 +148,13 @@ TEST_SUITE("Board controller") {
         SUBCASE("Getting a non-uncovered value") {
             CHECK_THROWS(controller.get_value(0, 0));
         }
+        SUBCASE("Getting changes after a successful select") {
+            controller.select(4, 0);
+            const std::vector<std::tuple<int, int, int>> changes = controller.get_changes();
+            for (auto change: changes) {
+                CHECK_NOTHROW(controller.get_value(std::get<0>(change), std::get<1>(change)));
+            }
+        }
     }
     TEST_CASE("Winning game") {
         GameLogic::BoardController controller;
