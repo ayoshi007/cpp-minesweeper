@@ -24,7 +24,8 @@ namespace GameLogic {
         enum Cover {
             Covered,
             Uncovered,
-            Flagged
+            Flagged,
+            Mine
         };
         private:
         int width {};

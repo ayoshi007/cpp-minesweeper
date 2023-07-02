@@ -317,8 +317,10 @@ namespace GameLogic {
             case Cover::Covered:
             case Cover::Uncovered:
                 lost = uncover_surroundings(r, c);
-            case Cover::Flagged:
                 break;
+            default:
+                break;
+            
         }
         // returns whether or not a mine was detonated
         done |= lost;
@@ -354,6 +356,8 @@ namespace GameLogic {
                 if (map[r][c] == -1) {
                     correct_flag_count--;
                 }
+                break;
+            default:
                 break;
         }
         done = correct_flag_count == mine_count;

@@ -24,7 +24,9 @@ namespace GameLogic {
         int get_flag_count();
         // gets value at a specific location only if location is uncovered
         int get_value(int x, int y);
-
+        // gets game status
+        bool is_game_lost();
+        bool is_game_won();
         // called in the event of a game over from a select
         const std::unordered_set<int>& get_mine_locations();
         std::unordered_set<int> get_incorrect_flags();

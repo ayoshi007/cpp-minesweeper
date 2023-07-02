@@ -48,11 +48,13 @@ namespace GameLogic {
         return board.get_flag_count();
     }
     int BoardController::get_value(int x, int y) {
-        if (board.get_visible_map()[x][y] != Board::Cover::Uncovered) {
+        if (!board.is_game_done() && board.get_visible_map()[x][y] != Board::Cover::Uncovered) {
             throw "Location is not uncovered";
         }
         return board.get_map()[x][y];
     }
+    bool BoardController::is_game_lost() { return board.is_game_lost(); }
+    bool BoardController::is_game_won() { return board.is_game_done() && !board.is_game_lost(); }
     const std::unordered_set<int>& BoardController::get_mine_locations() {
         if (!board.is_game_lost()) {
             throw "Game is not lost";

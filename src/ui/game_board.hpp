@@ -26,11 +26,12 @@ namespace GameUI {
         private:
         int width {};
         int height {};
+        int mine_count {};
         int mx {};
         int my {};
         int selected_row {};
         int selected_col {};
-        int mine_count {};
+        bool game_is_done {};
         int canvas_dimension {};
         GameLogic::BoardController board_controller;
         std::vector<std::vector<BoardCell>> game_board;
@@ -41,7 +42,7 @@ namespace GameUI {
         static std::function<void(ftxui::Canvas&, int, ftxui::Color)> fill_cell;
         static std::function<void(ftxui::Canvas&, int, ftxui::Color)> draw_flag;
         static std::function<void(ftxui::Canvas&, int, ftxui::Color)> draw_mine;
-        static std::function<void(ftxui::Canvas&, int, ftxui::Color)> draw_number;
+        static std::function<void(ftxui::Canvas&, int, ftxui::Color, int)> draw_number;
 
         void initialize_cells();
         void initialize_renderer();
