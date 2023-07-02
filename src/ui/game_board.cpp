@@ -110,7 +110,7 @@ namespace GameUI {
                     if (row >= 0 && row < height && col >= 0 && col < width) {
                         selected_col = col;
                         selected_row = row;
-                        bool won = false;
+                        /*
                         if (e.mouse().button == Mouse::Left) {
                             bool detonated = board_controller.select(selected_row, selected_col);
                             if (!detonated) {
@@ -122,22 +122,6 @@ namespace GameUI {
                             }
                         } else if (e.mouse().button == Mouse::Right) {
                             bool won = board_controller.flag(selected_row, selected_col);
-                        }
-                        // NEED TO IMPLEMENT LOGIC WITH BOARD_CONTROLLER!
-                        /*
-                        
-                        if (e.mouse().button == Mouse::Left) {
-                            detonated = board_controller.select(selected_row, selected_col);
-                        } else if (e.mouse().button == Mouse::Right) {
-                            won = board_controller.flag(selected_row, selected_col);
-                        }
-                        if (detonated || won) {
-                            // game is done
-                            if (detonated) {
-                                // lose
-                            } else {
-                                // win
-                            }
                         }
                         */
                     }
