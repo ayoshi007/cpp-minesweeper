@@ -35,6 +35,7 @@ namespace GameUI {
         initialize_cells();
         initialize_renderer();
     }
+    
     void GameBoard::initialize_cells() {
         for (int r = 0; r < height; r++) {
             std::vector<BoardCell> row;

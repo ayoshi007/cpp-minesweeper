@@ -37,6 +37,12 @@ namespace GameUI {
         ftxui::Component container;
         ftxui::Component renderer;
 
+        static std::function<void(ftxui::Canvas, int)> draw_border;
+        static std::function<void(ftxui::Canvas, int)> fill;
+        static std::function<void(ftxui::Canvas, int)> draw_flag;
+        static std::function<void(ftxui::Canvas, int)> draw_mine;
+        static std::function<void(ftxui::Canvas, int)> draw_number;
+
         void initialize_cells();
         void initialize_renderer();
         public:
