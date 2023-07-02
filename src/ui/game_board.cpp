@@ -11,6 +11,8 @@
 #include <ftxui/component/component_options.hpp>
 #include <ftxui/dom/canvas.hpp>
 
+#include <functional>
+
 using namespace ftxui;
 
 namespace GameUI {
@@ -19,6 +21,24 @@ namespace GameUI {
     Color GameBoard::flag_color = Color::DarkBlue;
     Color GameBoard::mine_color_detonated = Color::Salmon1;
     Color GameBoard::mine_color_win = Color::Gold1;
+
+    std::function<void(ftxui::Canvas&, int, ftxui::Color)> GameBoard::draw_border = [] (Canvas& canvas, int dimension, Color color) {
+        canvas.DrawPointLine(0, 0, dimension - 1, 0, color);
+        canvas.DrawPointLine(dimension - 1, 0, dimension - 1, dimension - 1, color);
+        canvas.DrawPointLine(0, 0, 0, dimension - 1, color);
+        canvas.DrawPointLine(0, dimension - 1, dimension - 1, dimension - 1, color);
+    };
+    /*
+    std::function<void(ftxui::Canvas&, int, ftxui::Color)> GameBoard::draw_flag = [] (Canvas& canvas, int dimension, Color color) {
+        
+    };
+    std::function<void(ftxui::Canvas&, int, ftxui::Color)> GameBoard::draw_mine = [] (Canvas& canvas, int dimension, Color color) {
+        
+    };
+    std::function<void(ftxui::Canvas&, int, ftxui::Color)> GameBoard::draw_number = [] (Canvas& canvas, int dimension, Color color) {
+        
+    };
+    */
 
     GameBoard::GameBoard(int w, int h, int mines) : 
         width {w},
@@ -31,7 +51,7 @@ namespace GameUI {
         board_controller {}
         {
         board_controller.initialize_board(w, h, mines);
-        canvas_dimension = 20;
+        canvas_dimension = 48;
         initialize_cells();
         initialize_renderer();
     }
@@ -47,10 +67,8 @@ namespace GameUI {
                 };
                 cell.renderer = Renderer([=] {
                     Canvas cell_canvas = Canvas(canvas_dimension, canvas_dimension);
-                    cell_canvas.DrawPointLine(0, 0, canvas_dimension - 1, 0, GameBoard::border_color);
-                    cell_canvas.DrawPointLine(canvas_dimension - 1, 0, canvas_dimension - 1, canvas_dimension - 1, GameBoard::border_color);
-                    cell_canvas.DrawPointLine(0, 0, 0, canvas_dimension - 1, GameBoard::border_color);
-                    cell_canvas.DrawPointLine(0, canvas_dimension - 1, canvas_dimension - 1, canvas_dimension - 1, GameBoard::border_color);
+                    draw_border(cell_canvas, canvas_dimension, GameBoard::border_color);
+                    
                     //cell_canvas.DrawText(5, 5, std::to_string(game_board[r][c].row) + ", " + std::to_string(game_board[r][c].col));
                     return canvas(std::move(cell_canvas));
                 });
@@ -92,9 +110,22 @@ namespace GameUI {
                     if (row >= 0 && row < height && col >= 0 && col < width) {
                         selected_col = col;
                         selected_row = row;
-                        /*
-                        bool detonated = false;
                         bool won = false;
+                        if (e.mouse().button == Mouse::Left) {
+                            bool detonated = board_controller.select(selected_row, selected_col);
+                            if (!detonated) {
+                                for (auto change: board_controller.get_changes()) {
+                                    
+                                }
+                            } else {
+
+                            }
+                        } else if (e.mouse().button == Mouse::Right) {
+                            bool won = board_controller.flag(selected_row, selected_col);
+                        }
+                        // NEED TO IMPLEMENT LOGIC WITH BOARD_CONTROLLER!
+                        /*
+                        
                         if (e.mouse().button == Mouse::Left) {
                             detonated = board_controller.select(selected_row, selected_col);
                         } else if (e.mouse().button == Mouse::Right) {
@@ -128,7 +159,7 @@ TEST_SUITE("Game board builder functions") {
         ScreenInteractive screen = ScreenInteractive::TerminalOutput();
         MESSAGE("Testing game board");
 
-        GameUI::GameBoard gb {5, 5, 5};
+        GameUI::GameBoard gb {2, 1, 1};
 
         screen.Loop(gb.get_game_board_renderer());
     }
