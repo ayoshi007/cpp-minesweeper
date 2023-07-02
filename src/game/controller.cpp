@@ -47,6 +47,12 @@ namespace GameLogic {
     int BoardController::get_flag_count()  {
         return board.get_flag_count();
     }
+    int BoardController::get_value(int x, int y) {
+        if (board.get_visible_map()[x][y] != Board::Cover::Uncovered) {
+            throw "Location is not uncovered";
+        }
+        return board.get_map()[x][y];
+    }
     const std::unordered_set<int>& BoardController::get_mine_locations() {
         if (!board.is_game_lost()) {
             throw "Game is not lost";
@@ -130,6 +136,17 @@ TEST_SUITE("Board controller") {
             std::unordered_set<int> incorrect_flags = controller.get_incorrect_flags();
             CHECK(incorrect_flags.size() == 1);
             CHECK(incorrect_flags.find(0) != incorrect_flags.end());
+        }
+    }
+    TEST_CASE("Getting location") {
+        GameLogic::BoardController controller;
+        controller.initialize_board(5, 5, 5, 5);
+        SUBCASE("Getting an uncovered value") {
+            controller.select(0, 0);
+            CHECK(controller.get_value(0, 0) == 1);
+        }
+        SUBCASE("Getting a non-uncovered value") {
+            CHECK_THROWS(controller.get_value(0, 0));
         }
     }
     TEST_CASE("Winning game") {
