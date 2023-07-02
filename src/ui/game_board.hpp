@@ -18,11 +18,10 @@ namespace GameUI {
     struct BoardCell {
         int row;
         int col;
-        ftxui::Color border_color;
-        ftxui::Color fill_color;
-        ftxui::Component renderer;
         GameLogic::Board::Cover cover;
+        ftxui::Component renderer;
     };
+    
     class GameBoard {
         private:
         int width {};
@@ -41,7 +40,14 @@ namespace GameUI {
         void initialize_cells();
         void initialize_renderer();
         public:
+        static ftxui::Color border_color;
+        static ftxui::Color fill_color;
+        static ftxui::Color flag_color;
+        static ftxui::Color mine_color_win;
+        static ftxui::Color mine_color_detonated;
+
         GameBoard(int width, int height, int mine_count);
+        ftxui::Component get_game_board_renderer();
     };
     class GameSideBar {
         private:
