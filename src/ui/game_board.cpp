@@ -87,7 +87,7 @@ namespace GameUI {
                     } else if (game_board[r][c].cover == GameLogic::Board::Cover::Flagged) {
                         draw_flag(cell_canvas, canvas_dimension, GameBoard::flag_color);
                     } else if (game_board[r][c].cover == GameLogic::Board::Cover::Uncovered) {
-                        draw_number(cell_canvas, canvas_dimension, GameBoard::border_color, board_controller.get_value(r, c));
+                        draw_number(cell_canvas, canvas_dimension, GameBoard::mine_color_win, board_controller.get_value(r, c));
                     }
                     //cell_canvas.DrawText(5, 5, std::to_string(game_board[r][c].row) + ", " + std::to_string(game_board[r][c].col));
                     return canvas(std::move(cell_canvas));
