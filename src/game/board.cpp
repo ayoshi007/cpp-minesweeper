@@ -202,6 +202,53 @@ namespace GameLogic {
         return counts;
     }
     /**
+     * Randomly finds an uncovered cell's coordinates given a mine's location
+     * Input:
+     *  x - the row of a mine
+     *  y - the column of a mine
+     * Output:
+     *  the coordinates of an un-mined cell
+    */
+    std::pair<int, int> Board::find_free_pos() {
+        // creates a random sequence of positions from which to choose from
+        std::vector<int> positions (width * height);
+        std::iota(positions.begin(), positions.end(), 0);
+        std::shuffle(positions.begin(), positions.end(), g);
+        int i{};
+        // returns the first free spot
+        while (mine_locations.find(positions[i]) != mine_locations.end()) {
+            i++;
+        }
+        std::pair<int, int> free_pos {positions[i] / width, positions[i] % width};
+        return free_pos;
+    }
+    /**
+     * Selects the cell at row x, column y.
+     * Will guarantee that the first selected cell in the board does not cause a game over.
+     * Returns whether or not the select_helper move caused a mine to detonate.
+     * Input:
+     *  x - the row to select
+     *  y - the column to select
+     * Output:
+     *  a boolean describing whether or not a mine was detonated
+    */
+    bool Board::select_helper(int r, int c) {
+        // allow selection for covered and uncovered locations
+        // flagged locations cannot be selected
+        switch(visible_map[r][c]) {
+            case Cover::Covered:
+            case Cover::Uncovered:
+                lost = uncover_surroundings(r, c);
+                break;
+            default:
+                break;
+            
+        }
+        // returns whether or not a mine was detonated
+        done |= lost;
+        return lost;
+    }
+    /**
      * A helper function used by select_helper()
      * Will recursively uncover the visible map according to what value is at row x, column y
      * Input:
@@ -248,27 +295,7 @@ namespace GameLogic {
         // return whether or not recursive calls uncovered a mine
         return mine_detonated;
     }
-    /**
-     * Randomly finds an uncovered cell's coordinates given a mine's location
-     * Input:
-     *  x - the row of a mine
-     *  y - the column of a mine
-     * Output:
-     *  the coordinates of an un-mined cell
-    */
-    std::pair<int, int> Board::find_free_pos() {
-        // creates a random sequence of positions from which to choose from
-        std::vector<int> positions (width * height);
-        std::iota(positions.begin(), positions.end(), 0);
-        std::shuffle(positions.begin(), positions.end(), g);
-        int i{};
-        // returns the first free spot
-        while (mine_locations.find(positions[i]) != mine_locations.end()) {
-            i++;
-        }
-        std::pair<int, int> free_pos {positions[i] / width, positions[i] % width};
-        return free_pos;
-    }
+    
     bool Board::select(int r, int c) {
         // if this call to select() is a first move, make sure it doesn't cause a game over
         if (!started) {
@@ -301,32 +328,7 @@ namespace GameLogic {
         most_recent_changes.clear();
         return select_helper(r, c);
     }
-    /**
-     * Selects the cell at row x, column y.
-     * Will guarantee that the first selected cell in the board does not cause a game over.
-     * Returns whether or not the select_helper move caused a mine to detonate.
-     * Input:
-     *  x - the row to select
-     *  y - the column to select
-     * Output:
-     *  a boolean describing whether or not a mine was detonated
-    */
-    bool Board::select_helper(int r, int c) {
-        // allow selection for covered and uncovered locations
-        // flagged locations cannot be selected
-        switch(visible_map[r][c]) {
-            case Cover::Covered:
-            case Cover::Uncovered:
-                lost = uncover_surroundings(r, c);
-                break;
-            default:
-                break;
-            
-        }
-        // returns whether or not a mine was detonated
-        done |= lost;
-        return lost;
-    }
+    
     /**
      * Flags the location at row x, column y
      * Input:

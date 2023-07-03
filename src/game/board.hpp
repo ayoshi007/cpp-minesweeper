@@ -50,11 +50,12 @@ namespace GameLogic {
         const std::vector<std::pair<int, int>> get_surrounding_positions(int x, int y);
         // returns the number of each Cover given a vector of positions
         std::unordered_map<Cover, int> get_visibilities(const std::vector<std::pair<int, int>>& surrounding_positions);
+
+        // randomly finds an unmined position
+        std::pair<int, int> find_free_pos();
         // helper functions for select()
         bool select_helper(int x, int y);
         bool uncover_surroundings(int x, int y);
-        // randomly finds an unmined position
-        std::pair<int, int> find_free_pos();
 
         public:
         // seeded constructors are included for testability
