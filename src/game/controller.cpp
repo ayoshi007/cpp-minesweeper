@@ -108,7 +108,7 @@ TEST_SUITE("Board controller") {
                 CHECK_THROWS(controller.initialize_board(-8, 8, 10));
             }
             SUBCASE("Too many mines") {
-                CHECK_THROWS(controller.initialize_board(8, 8, 64));
+                CHECK_THROWS(controller.initialize_board(8, 8, 55));
             }
         }
     }
