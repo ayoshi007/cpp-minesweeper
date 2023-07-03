@@ -10,8 +10,8 @@ namespace GameLogic {
         if (width <= 0 || height <= 0 || mine_count <= 0) {
             throw "Cannot accept negative arguments";
         }
-        if (width * height <= mine_count) {
-            throw "Mine count cannot exceed total number of cells";
+        if (width * height - 10 <= mine_count) {
+            throw "Mine count must leave at least 10 open spaces";
         }
         board = Board(width, height, mine_count, seed);
         return true;
@@ -20,8 +20,8 @@ namespace GameLogic {
         if (width <= 0 || height <= 0 || mine_count <= 0) {
             throw "Cannot accept negative arguments";
         }
-        if (width * height <= mine_count) {
-            throw "Mine count cannot exceed total number of cells";
+        if (width * height - 10 <= mine_count) {
+            throw "Mine count must leave at least 10 open spaces";
         }
         board = Board(width, height, mine_count);
         return true;
