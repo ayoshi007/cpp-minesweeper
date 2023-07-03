@@ -240,6 +240,7 @@ namespace GameLogic {
             std::unordered_map<Cover, int> visibilties = get_visibilities(surrounding_positions);
             if (visibilties[Cover::Covered] > 0 && visibilties[Cover::Flagged] == map[r][c]) {
                 for (auto pos: surrounding_positions) {
+                    // need to change this to only uncover surroundings recursively if the value is 0
                     mine_detonated |= select_helper(pos.first, pos.second);
                 }
             }

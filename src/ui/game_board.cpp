@@ -135,9 +135,8 @@ namespace GameUI {
                         selected_col = col;
                         selected_row = row;
                         if (e.mouse().button == Mouse::Left) {
-                            bool detonated = board_controller.select(selected_row, selected_col);
-                            game_is_done = detonated;
-                            if (!detonated) {
+                            game_is_done = board_controller.select(selected_row, selected_col);
+                            if (!game_is_done) {
                                 for (auto change: board_controller.get_changes()) {
                                     game_board[std::get<0>(change)][std::get<1>(change)].cover = GameLogic::Board::Cover::Uncovered;
                                 }
@@ -145,9 +144,8 @@ namespace GameUI {
                                 game_board[selected_row][selected_col].cover = GameLogic::Board::Cover::Mine;
                             }
                         } else if (e.mouse().button == Mouse::Right) {
-                            bool won = board_controller.flag(selected_row, selected_col);
-                            game_is_done = won;
-                            game_board[selected_row][selected_col].cover = GameLogic::Board::Cover::Flagged;
+                            game_is_done = board_controller.flag(selected_row, selected_col);
+                            game_board[selected_row][selected_col].cover = board_controller.get_cover(selected_row, selected_col);
                         }
                     }
                 }

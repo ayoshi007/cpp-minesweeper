@@ -24,6 +24,8 @@ namespace GameLogic {
         int get_flag_count();
         // gets value at a specific location only if location is uncovered
         int get_value(int x, int y);
+        // gets cover at location
+        Board::Cover get_cover(int x, int y);
         // gets game status
         bool is_game_lost();
         bool is_game_won();
