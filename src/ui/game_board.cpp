@@ -45,7 +45,7 @@ namespace GameUI {
     };
     std::function<void(ftxui::Canvas&, int, ftxui::Color, int)> GameBoard::draw_number = [] (Canvas& canvas, int dimension, Color color, int number) {
         canvas.DrawText(dimension / 2, dimension / 2, std::to_string(number), [=] (Pixel& p) {
-            p.background_color = color;
+            p.background_color = Color::Black;
             p.foreground_color = color;
         });
     };
@@ -104,6 +104,7 @@ namespace GameUI {
                 container->Add(col.renderer);
             }
         }
+        container |= bgcolor(Color::Black);
         renderer = Renderer(container, [=] {
             std::vector<std::vector<Element>> grid;
             for (int r = 0; r < height; r++) {
@@ -141,7 +142,10 @@ namespace GameUI {
                                     game_board[std::get<0>(change)][std::get<1>(change)].cover = GameLogic::Board::Cover::Uncovered;
                                 }
                             } else {
-                                game_board[selected_row][selected_col].cover = GameLogic::Board::Cover::Mine;
+                                for (auto mine_loc: board_controller.get_mine_locations()) {
+                                    std::cerr << "Mine at: " << mine_loc << ", or " << mine_loc / width << ", " << mine_loc % width << '\n';
+                                    game_board[mine_loc / width][mine_loc % width].cover = GameLogic::Board::Cover::Mine;
+                                }
                             }
                         } else if (e.mouse().button == Mouse::Right) {
                             game_is_done = board_controller.flag(selected_row, selected_col);
@@ -152,7 +156,8 @@ namespace GameUI {
                 return true;
             }
             return false;
-        });
+        })
+        | bgcolor(Color::Black);
     }
 
     Component GameBoard::get_game_board_renderer() {
