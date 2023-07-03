@@ -34,13 +34,13 @@ namespace GameUI {
     std::function<void(ftxui::Canvas&, int, ftxui::Color)> GameBoard::draw_flag = [] (Canvas& canvas, int dimension, Color color) {
         canvas.DrawText(dimension / 2, dimension / 2, "^", [=] (Pixel& p) {
             p.background_color = color;
-            p.foreground_color = color;
+            p.foreground_color = Color::Black;
         });
     };
     std::function<void(ftxui::Canvas&, int, ftxui::Color)> GameBoard::draw_mine = [] (Canvas& canvas, int dimension, Color color) {
         canvas.DrawText(dimension / 2, dimension / 2, "*", [=] (Pixel& p) {
             p.background_color = color;
-            p.foreground_color = color;
+            p.foreground_color = Color::Black;
         });
     };
     std::function<void(ftxui::Canvas&, int, ftxui::Color, int)> GameBoard::draw_number = [] (Canvas& canvas, int dimension, Color color, int number) {
@@ -63,7 +63,23 @@ namespace GameUI {
         board_controller {}
         {
         board_controller.initialize_board(w, h, mines);
-        canvas_dimension = 24;
+        canvas_dimension = 12;
+        initialize_cells();
+        initialize_renderer();
+    }
+    GameBoard::GameBoard(int w, int h, int mines, int seed) : 
+        width {w},
+        height {h},
+        mine_count {mines},
+        mx {},
+        my {},
+        selected_row {},
+        selected_col {},
+        game_is_done {false},
+        board_controller {}
+        {
+        board_controller.initialize_board(w, h, mines, seed);
+        canvas_dimension = 12;
         initialize_cells();
         initialize_renderer();
     }
@@ -143,8 +159,9 @@ namespace GameUI {
                                 }
                             } else {
                                 for (auto mine_loc: board_controller.get_mine_locations()) {
-                                    std::cerr << "Mine at: " << mine_loc << ", or " << mine_loc / width << ", " << mine_loc % width << '\n';
-                                    game_board[mine_loc / width][mine_loc % width].cover = GameLogic::Board::Cover::Mine;
+                                    if (game_board[mine_loc / width][mine_loc % width].cover != GameLogic::Board::Cover::Flagged) {
+                                        game_board[mine_loc / width][mine_loc % width].cover = GameLogic::Board::Cover::Mine;
+                                    }
                                 }
                             }
                         } else if (e.mouse().button == Mouse::Right) {
@@ -171,7 +188,7 @@ TEST_SUITE("Game board builder functions") {
         ScreenInteractive screen = ScreenInteractive::TerminalOutput();
         MESSAGE("Testing game board");
 
-        GameUI::GameBoard gb {8, 8, 10};
+        GameUI::GameBoard gb {16, 16, 40, 5};
 
         screen.Loop(gb.get_game_board_renderer());
     }

@@ -54,6 +54,7 @@ namespace GameUI {
         static ftxui::Color mine_color_detonated;
 
         GameBoard(int width, int height, int mine_count);
+        GameBoard(int width, int height, int mine_count, int seed);
         ftxui::Component get_game_board_renderer();
     };
     class GameSideBar {
