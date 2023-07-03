@@ -140,8 +140,8 @@ TEST_SUITE("Main menu builder functions") {
                 mine_count = width_value * height_value * mine_percent / 100;
                 if (mine_count == 0) {
                     mine_count += 2;
-                } else if (mine_count == width_value * height_value) {
-                    mine_count -= 2;
+                } else if (width_value * height_value - 10 < mine_count) {
+                    mine_count = width_value * height_value - 10;
                 }
             }
         );
