@@ -51,8 +51,8 @@ namespace GameLogic {
         // returns the number of each Cover given a vector of positions
         std::unordered_map<Cover, int> get_visibilities(const std::vector<std::pair<int, int>>& surrounding_positions);
 
-        // randomly finds an unmined position
-        std::pair<int, int> find_free_pos();
+        // initializes board upon first select
+        void set_board(int first_r, int first_c);
         // helper functions for select()
         bool select_helper(int x, int y);
         bool uncover_surroundings(int x, int y);
@@ -71,8 +71,7 @@ namespace GameLogic {
         int get_flag_count();
         int get_mine_count();
         int get_correct_flag_count();
-        void clear_board();
-        void set_board(int w, int h, int mines);
+        void reset_game();
 
         const std::vector<std::vector<int>>& get_map();
         const std::unordered_set<int>& get_mine_locations();

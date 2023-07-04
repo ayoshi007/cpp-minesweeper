@@ -16,20 +16,9 @@ namespace GameLogic {
     Board::Board(int mt_seed) : Board{constants::DEFAULT_CUSTOM_W, constants::DEFAULT_CUSTOM_H, constants::SMALL_BOARD_MINES, mt_seed} {
 
     }
-    Board::Board(int w, int h, int mines, int mt_seed) :
-        flag_count { 0 }, 
-        correct_flag_count { 0 },
-        lost { false },
-        done { false },
-        started { false },
-        map {},
-        visible_map {},
-        mine_locations {},
-        flag_locations {},
-        most_recent_changes {}
+    Board::Board(int w, int h, int mines, int mt_seed) : Board{w, h, mines} 
         {
         g.seed(mt_seed);
-        set_board(w, h, mines);
     }
     Board::Board(int w, int h, int mines) :
         flag_count { 0 }, 
@@ -43,7 +32,6 @@ namespace GameLogic {
         flag_locations {},
         most_recent_changes {}
         {
-        set_board(w, h, mines);
     }
     int Board::get_width() { return width; }
     int Board::get_height() { return height; }
@@ -56,56 +44,21 @@ namespace GameLogic {
     /**
      * Clears the board's state back to default values
     */
-    void Board::clear_board() {
+    void Board::reset_game() {
         flag_count = 0;
         correct_flag_count = 0;
-        width = 0;
-        height = 0;
-        mine_count = 0;
         lost = false;
         done = false;
         started = false;
-        map.clear();
-        visible_map.clear();
-        mine_locations.clear();
         flag_locations.clear();
-    }
-    /**
-     * Sets the board to a new one of the specified width, height, and mine count
-     * Input:
-     * w - board's new width
-     * h - board's new height
-     * mines - board's new mine count
-    */
-    void Board::set_board(int w, int h, int mines) {
-        clear_board();
-        width = w;
-        height = h;
-        mine_count = mines;
-        for (int r{}; r < h; r++) {
-            map.push_back(std::vector<int> (w));
-            visible_map.push_back(std::vector<Cover> (w));
-        }
-        std::vector<int> positions (w * h);
-        
-        // randomly choose the mine locations
-        std::iota(positions.begin(), positions.end(), 0);
-        std::shuffle(positions.begin(), positions.end(), g);
-        for (int i{}; i < mines; i++) {
-            int mine_pos = positions[i];
-            int r = mine_pos / w;
-            int c = mine_pos % w;
-            // mines are given a value of -1
-            map[r][c] = -1;
-            visible_map[r][c] = Cover::Covered;
-            mine_locations.insert(mine_pos);
-            // increments the values of all positions surrounding the mine
-            const std::vector<std::pair<int, int>> surrounding_positions = get_surrounding_positions(r, c);
-            for (auto pos: surrounding_positions) {
-                map[pos.first][pos.second] = map[pos.first][pos.second] == -1 ? map[pos.first][pos.second] : map[pos.first][pos.second] + 1;
+        most_recent_changes.clear();
+        for (int r = 0; r < visible_map.size(); r++) {
+            for (int c = 0; c < visible_map[r].size(); c++) {
+                visible_map[r][c] = Cover::Covered;
             }
         }
     }
+    
     const std::vector<std::vector<int>>& Board::get_map() {
         return map;
     }
@@ -202,25 +155,42 @@ namespace GameLogic {
         return counts;
     }
     /**
-     * Randomly finds an uncovered cell's coordinates given a mine's location
+     * Sets the board's mine locations, avoiding the given position and it's 
+     *  adjacent positions.
      * Input:
-     *  x - the row of a mine
-     *  y - the column of a mine
-     * Output:
-     *  the coordinates of an un-mined cell
+     * first_r - the row of the position to avoid
+     * first_c - the column of the position to avoid
     */
-    std::pair<int, int> Board::find_free_pos() {
-        // creates a random sequence of positions from which to choose from
+    void Board::set_board(int first_r, int first_c) {
+        clear_board();
+        std::vector<std::pair<int, int>> mine_free_positions = get_surrounding_positions(first_r, first_c);
+        mine_free_positions.push_back({first_r, first_c});
+        for (int r{}; r < height; r++) {
+            map.push_back(std::vector<int> (width));
+            visible_map.push_back(std::vector<Cover> (width));
+        }
         std::vector<int> positions (width * height);
+        
+        // randomly choose the mine locations
         std::iota(positions.begin(), positions.end(), 0);
         std::shuffle(positions.begin(), positions.end(), g);
-        int i{};
-        // returns the first free spot
-        while (mine_locations.find(positions[i]) != mine_locations.end()) {
-            i++;
+        for (int i{}; i < mines; i++) {
+            int mine_pos = positions[i];
+            int r = mine_pos / w;
+            int c = mine_pos % w;
+            visible_map[r][c] = Cover::Covered;
+            if (std::find(mine_free_positions.begin(), mine_free_positions.end(), {r, c}) != mine_free_positions.end()) {
+                continue;
+            }
+            // mines are given a value of -1
+            map[r][c] = -1;
+            mine_locations.insert(mine_pos);
+            // increments the values of all positions surrounding the mine
+            const std::vector<std::pair<int, int>> surrounding_positions = get_surrounding_positions(r, c);
+            for (auto pos: surrounding_positions) {
+                map[pos.first][pos.second] = map[pos.first][pos.second] == -1 ? map[pos.first][pos.second] : map[pos.first][pos.second] + 1;
+            }
         }
-        std::pair<int, int> free_pos {positions[i] / width, positions[i] % width};
-        return free_pos;
     }
     /**
      * Selects the cell at row x, column y.
@@ -297,33 +267,11 @@ namespace GameLogic {
     }
     
     bool Board::select(int r, int c) {
-        // if this call to select() is a first move, make sure it doesn't cause a game over
+        // on the first move, initialize the board
+        // the first selected position is guaranteed to be a 0
         if (!started) {
             started = true;
-            // if the first selected position is a mine position, swap it with a free position and then proceed with the rest of the function
-            if (map[r][c] == -1) {
-                // find a free position, and the surrounding positions of the selected and free position
-                std::pair<int, int> free_pos = find_free_pos();
-                std::vector<std::pair<int, int>> old_spot_surroundings = get_surrounding_positions(r, c);
-                std::vector<std::pair<int, int>> new_spot_surroundings = get_surrounding_positions(free_pos.first, free_pos.second);
-
-                // make the selected position a free position
-                map[r][c] = 0;
-                mine_locations.erase(r * width + c);
-                for (auto pos: old_spot_surroundings) {
-                    if (map[pos.first][pos.second] == -1) {
-                        map[r][c]++;
-                    } else {
-                        map[pos.first][pos.second] = std::max(map[pos.first][pos.second] - 1, 0);
-                    }
-                }
-                // make the free position a mine location
-                map[free_pos.first][free_pos.second] = -1;
-                mine_locations.insert(free_pos.first * width + free_pos.second);
-                for (auto pos: new_spot_surroundings) {
-                    map[pos.first][pos.second] = map[pos.first][pos.second] == -1 ? map[pos.first][pos.second] : map[pos.first][pos.second] + 1;
-                }
-            }
+            set_board(r, c);
         }
         most_recent_changes.clear();
         return select_helper(r, c);
