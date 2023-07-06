@@ -1,11 +1,13 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
+#include <iostream>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
 #include <tuple>
-#include <utility>
+#include <queue>
+#include <string>
+#include <numeric>
 #include <algorithm>
 #include <random>
 
@@ -55,7 +57,7 @@ namespace GameLogic {
         void set_board(int first_r, int first_c);
         // helper functions for select()
         bool select_helper(int x, int y);
-        bool uncover_surroundings(int x, int y);
+        void uncover_zero_poses(std::queue<std::pair<int, int>>& zero_poses);
 
         public:
         // seeded constructors are included for testability
