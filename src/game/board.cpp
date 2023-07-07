@@ -222,14 +222,17 @@ namespace GameLogic {
                 std::queue<std::pair<int, int>> zero_poses;
                 if (get_visibilities(surroundings)[Cover::Flagged] == map[r][c]) {
                     for (auto pos: surroundings) {
-                        most_recent_changes.push_back(std::tuple<int, int, int>{pos.first, pos.second, map[pos.first][pos.second]});
-                        if (map[pos.first][pos.second] == -1) {
-                            lost = true;
-                            visible_map[r][c] = Cover::Mine;
-                        } else if (map[pos.first][pos.second] > 0) {
-                            visible_map[r][c] = Cover::Uncovered;
-                        } else {
-                            zero_poses.push(std::pair<int, int> {pos.first, pos.second});
+                        if (visible_map[pos.first][pos.second] == Cover::Covered) {
+                            if (map[pos.first][pos.second] == -1) {
+                                most_recent_changes.push_back(std::tuple<int, int, int>{pos.first, pos.second, map[pos.first][pos.second]});
+                                visible_map[pos.first][pos.second] = Cover::Mine;
+                                lost = true;
+                            } else if (map[pos.first][pos.second] > 0) {
+                                most_recent_changes.push_back(std::tuple<int, int, int>{pos.first, pos.second, map[pos.first][pos.second]});
+                                visible_map[pos.first][pos.second] = Cover::Uncovered;
+                            } else {
+                                zero_poses.push(std::pair<int, int> {pos.first, pos.second});
+                            }
                         }
                     }
                     uncover_zero_poses(zero_poses);
@@ -242,14 +245,10 @@ namespace GameLogic {
     }
     /**
      * A helper function used by select_helper()
-     * Will recursively uncover the visible map according to what value is at row x, column y
+     * Will uncover the adjacencies of a group of positions with 0 mines around it
      * Input:
-     *  x - the row to uncover
-     *  y - the column to uncover
-     * Output
-     *  A boolean indicating whether or not a mine was uncovered
+     *  zero_poses - a queue containing positions with zero mines around them
     */
-   // MAY NEED TO CHANGE THIS TO ONLY RETURN THE LOCATIONS UNCOVERED THAT ARE 0
     void Board::uncover_zero_poses(std::queue<std::pair<int, int>>& zero_poses) {
         while (!zero_poses.empty()) {
             std::pair<int, int> zero_pos = zero_poses.front();
@@ -259,10 +258,10 @@ namespace GameLogic {
             std::vector<std::pair<int, int>> surroundings = get_surrounding_positions(zero_pos.first, zero_pos.second);
             for (auto pos: surroundings) {
                 if (visible_map[pos.first][pos.second] == Cover::Covered) {
+                    visible_map[pos.first][pos.second] = Cover::Uncovered;
                     if (map[pos.first][pos.second] == 0) {
                         zero_poses.push(std::pair<int, int> {pos.first, pos.second});
                     } else {
-                        visible_map[pos.first][pos.second] = Cover::Uncovered;
                         most_recent_changes.push_back(std::tuple<int, int, int> {pos.first, pos.second, map[pos.first][pos.second]});
                     }
                 }
@@ -332,8 +331,6 @@ TEST_SUITE("Board object") {
         SUBCASE("Flag uncovered position") {
             b.select(0, 0);
             b.flag(0, 0);
-            MESSAGE("Printing map");
-            print_map(b.get_map());
             CHECK(b.is_game_started() == true);
             CHECK(b.get_visible_map()[0][0] == GameLogic::Board::Cover::Uncovered);
             CHECK(b.get_flag_count() == 0);
@@ -349,8 +346,6 @@ TEST_SUITE("Board object") {
             b.select(0, 0);
             CHECK(b.is_game_started() == true);
             b.flag(5, 5);
-            MESSAGE("Printing map");
-            print_map(b.get_state_map());
             CHECK(b.get_visible_map()[5][5] == GameLogic::Board::Cover::Flagged);
             CHECK(b.get_flag_count() == 1);
             CHECK(b.get_flag_locations().size() == 1);
@@ -385,35 +380,28 @@ TEST_SUITE("Board object") {
         }
     }
     
-    TEST_CASE("Selecting" * doctest::skip()) {
+    TEST_CASE("Selecting") {
         GameLogic::Board b {8, 8, 10, 5};
         /*
         MESSAGE("Displaying map");
         print_map(b.get_map());
         */
         SUBCASE("First select mine location") {
-            bool gameOver = b.select(1, 2);
+            bool gameOver = b.select(0, 0);
             CHECK(gameOver == false);
             CHECK(b.is_game_lost() == false);
             CHECK(b.is_game_done() == false);
+            CHECK(b.get_map()[0][0] != -1);
+            CHECK(b.get_map()[0][1] != -1);
+            CHECK(b.get_map()[1][0] != -1);
+            CHECK(b.get_map()[1][1] != -1);
             if (gameOver) {
                 MESSAGE("Displaying visible board");
                 print_map(b.get_state_map());
             }
-        }
-        SUBCASE("Non mine location") {
-            bool gameOver = b.select(0, 4);
-            CHECK(gameOver == false);
-            CHECK(b.is_game_lost() == false);
-            CHECK(b.is_game_done() == false);
-            if (gameOver) {
-                MESSAGE("Displaying visible board");
-                print_map(b.get_state_map());
-            }
-            CHECK(b.get_most_recent_changes().size() == 1);
         }
         SUBCASE("Mine location after first select") {
-            b.select(0, 4);
+            b.select(0, 0);
             bool gameOver = b.select(1, 2);
             CHECK(gameOver == true);
             CHECK(b.is_game_lost() == true);
@@ -424,37 +412,61 @@ TEST_SUITE("Board object") {
             }
         }
         SUBCASE("Select position with 0 mines around it") {
+            b.select(0, 0);
             b.select(0, 5);
             CHECK(b.get_most_recent_changes().size() == 18);
             const std::vector<std::tuple<int, int, int>> changes = b.get_most_recent_changes();
             for (auto change: changes) {
+                std::cout << std::get<0>(change) << ", " << std::get<1>(change) << " = " << std::get<2>(change) << '\n';
                 CHECK(b.get_visible_map()[std::get<0>(change)][std::get<1>(change)] == GameLogic::Board::Cover::Uncovered);
                 CHECK(b.get_map()[std::get<0>(change)][std::get<1>(change)] == std::get<2>(change));
             }
+            MESSAGE("Printing visible map");
+            print_map(b.get_state_map());
         }
-        SUBCASE("Select uncovered position with equal number of flags around it") {
+        
+        SUBCASE("Select uncovered position with correct flags around it") {
             b.select(0, 0);
-            b.flag(0, 1);
-            b.select(0, 0);
-            CHECK(b.get_visible_map()[1][0] == GameLogic::Board::Cover::Uncovered);
-            CHECK(b.get_visible_map()[1][1] == GameLogic::Board::Cover::Uncovered);
-            CHECK(b.get_correct_flag_count() == 1);
-            CHECK(b.get_most_recent_changes().size() == 2);
+            MESSAGE("Printing map");
+            print_map(b.get_map());
+            b.flag(1, 2);
+            b.flag(2, 1);
+            b.select(1, 1);
+            MESSAGE("Printing visible map");
+            print_map(b.get_state_map());
+            CHECK(b.get_visible_map()[0][2] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[2][0] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[2][2] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_correct_flag_count() == 2);
+            CHECK(b.get_most_recent_changes().size() == 3);
         }
+        
         SUBCASE("Select uncovered position without equal number of flags around it") {
             b.select(0, 0);
-            b.select(0, 0);
-            CHECK(b.get_visible_map()[0][1] == GameLogic::Board::Cover::Covered);
-            CHECK(b.get_visible_map()[1][0] == GameLogic::Board::Cover::Covered);
-            CHECK(b.get_visible_map()[1][1] == GameLogic::Board::Cover::Covered);
+            MESSAGE("Printing map");
+            print_map(b.get_map());
+            b.flag(1, 2);
+            b.select(1, 1);
+            MESSAGE("Printing visible map");
+            print_map(b.get_state_map());
+            CHECK(b.get_visible_map()[0][2] == GameLogic::Board::Cover::Covered);
+            CHECK(b.get_visible_map()[2][0] == GameLogic::Board::Cover::Covered);
+            CHECK(b.get_visible_map()[2][2] == GameLogic::Board::Cover::Covered);
             CHECK(b.get_most_recent_changes().empty());
         }
         SUBCASE("Select uncovered position with equal number of flags at incorrect positions") {
             b.select(0, 0);
-            b.flag(1, 0);
-            bool gameOver = b.select(0, 0);
-            CHECK(gameOver == true);
-            CHECK(b.get_most_recent_changes().size() == 2);
+            MESSAGE("Printing map");
+            print_map(b.get_map());
+            b.flag(0, 2);
+            b.flag(1, 2);
+            b.select(1, 1);
+            MESSAGE("Printing visible map");
+            print_map(b.get_state_map());
+            CHECK(b.get_visible_map()[2][0] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_visible_map()[2][1] == GameLogic::Board::Cover::Mine);
+            CHECK(b.get_visible_map()[2][2] == GameLogic::Board::Cover::Uncovered);
+            CHECK(b.get_most_recent_changes().size() == 3);
             CHECK(b.is_game_lost() == true);
             CHECK(b.is_game_done() == true);
         }
