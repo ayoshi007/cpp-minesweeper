@@ -4,8 +4,8 @@ while getopts "G:B:T:U:h" flag ; do
         B) BUILD_TYPE="${OPTARG}";;
         T) CPPMS_ENABLE_TESTING="${OPTARG}";;
         U) CPPMS_RUN_UI_TESTS="${OPTARG}";;
-        h) echo "Usage: ./build.sh [-G <Ninja|\"Unix Makefiles\">] [-B <Debug|Release>] [-T <ON|OFF>] [-U <ON|OFF>]" && exit;;
-        ?) echo "Usage: ./build.sh [-G <Ninja|\"Unix Makefiles\">] [-B <Debug|Release>] [-T <ON|OFF>] [-U <ON|OFF>]";;
+        h) echo "Usage: ./build.sh [-G <Ninja|\"Unix Makefiles\">] [-B <Debug|Release>] [-T <ON|OFF>] [-U <ON|OFF>]" && echo "Make sure you have your desired build generator installed on your system" && exit;;
+        ?) echo "Usage: ./build.sh [-G <Ninja|\"Unix Makefiles\">] [-B <Debug|Release>] [-T <ON|OFF>] [-U <ON|OFF>]" && echo "Make sure you have your desired build generator installed on your system" && exit;;
     esac
 done
 
