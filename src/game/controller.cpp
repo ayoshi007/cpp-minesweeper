@@ -171,19 +171,25 @@ TEST_SUITE("Board controller") {
             }
         }
     }
-    TEST_CASE("Winning game" * doctest::skip()) {
+    TEST_CASE("Winning game") {
         GameLogic::BoardController controller;
-        controller.initialize_board(5, 5, 5, 5);
+        controller.initialize_board(8, 8, 10, 5);
         MESSAGE("Displaying board");
         print_map(controller.get_map());
         CHECK_THROWS(controller.get_incorrect_flags());
         CHECK_THROWS(controller.get_mine_locations());
         CHECK_NOTHROW(controller.get_changes());
-        controller.flag(0, 1);
-        controller.flag(1, 4);
-        controller.flag(2, 0);
-        controller.flag(2, 2);
-        controller.flag(3, 4);
+        controller.flag(1, 2);
+        controller.flag(1, 3);
+        controller.flag(2, 1);
+        controller.flag(3, 5);
+        controller.flag(5, 0);
+        controller.flag(5, 5);
+        controller.flag(6, 4);
+        controller.flag(6, 7);
+        controller.flag(7, 1);
+        controller.flag(7, 2);
+        controller.select(0, 0);
         CHECK_THROWS(controller.get_incorrect_flags());
         CHECK_THROWS(controller.get_mine_locations());
         CHECK_THROWS(controller.select(0, 0));
