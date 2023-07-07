@@ -78,7 +78,8 @@ elif [[ "${CPPMS_ENABLE_TESTING}" = "OFF" ]] ; then
 fi
 
 # make build subdirectory name
-BUILD_DIR=`echo ${CONFIG} | tr A-Z a-z`
+BUILD_DIR=`echo build/${CONFIG} | tr A-Z a-z`
+BUILD_DIR+=`echo _${GENERATOR// /_}`
 
 # output options used
 cat << EOF
@@ -87,15 +88,17 @@ Generator (-g):         ${GENERATOR}
 Configuration (-c):     ${CONFIG}
 Build tests (-t,-nt):   ${CPPMS_ENABLE_TESTING}
 Run UI tests (-ui):     ${CPPMS_RUN_UI_TESTS}
+Build directory:        ${BUILD_DIR}
 
 EOF
 
 # configure
-cmake -S . -B build/"${BUILD_DIR}" -G "${GENERATOR}" \
+cmake -S . -B "${BUILD_DIR}" -G "${GENERATOR}" \
     -DCMAKE_BUILD_TYPE="${CONFIG}" \
     -DCPPMS_ENABLE_TESTING="${CPPMS_ENABLE_TESTING}" \
     -DCPPMS_RUN_UI_TESTS="${CPPMS_RUN_UI_TESTS}" \
     -DFTXUI_BUILD_EXAMPLES=OFF \
-    -DFTXUI_BUILD_TESTS=OFF || exit 1
+    -DFTXUI_BUILD_TESTS=OFF \
+    || exit 1
 # build
-cmake --build build/"${BUILD_DIR}"
+cmake --build "${BUILD_DIR}"
