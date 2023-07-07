@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# usage message
+# usage message 
 usage_msg () {
     cat << EOF
 Usage:
@@ -96,6 +96,6 @@ cmake -S . -B build/"${BUILD_DIR}" -G "${GENERATOR}" \
     -DCPPMS_ENABLE_TESTING="${CPPMS_ENABLE_TESTING}" \
     -DCPPMS_RUN_UI_TESTS="${CPPMS_RUN_UI_TESTS}" \
     -DFTXUI_BUILD_EXAMPLES=OFF \
-    -DFTXUI_BUILD_TESTS=OFF
+    -DFTXUI_BUILD_TESTS=OFF || exit 1
 # build
 cmake --build build/"${BUILD_DIR}"
