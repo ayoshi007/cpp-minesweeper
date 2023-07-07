@@ -91,7 +91,7 @@ namespace GameLogic {
     }
 }
 
-TEST_SUITE("Board controller" * doctest::skip()) {
+TEST_SUITE("Board controller") {
     TEST_CASE("Board controller creation") {
         SUBCASE("Create controller") {
             GameLogic::BoardController controller;
@@ -110,9 +110,12 @@ TEST_SUITE("Board controller" * doctest::skip()) {
             SUBCASE("Too many mines") {
                 CHECK_THROWS(controller.initialize_board(8, 8, 55));
             }
+            SUBCASE("Max possible mines") {
+                CHECK_NOTHROW(controller.initialize_board(8, 8, 54));
+            }
         }
     }
-    TEST_CASE("Selecting/flagging") {
+    TEST_CASE("Selecting/flagging" * doctest::skip()) {
         GameLogic::BoardController controller;
         controller.initialize_board(5, 5, 5, 5);
         MESSAGE("Displaying board");
@@ -143,7 +146,7 @@ TEST_SUITE("Board controller" * doctest::skip()) {
             CHECK(incorrect_flags.find(0) != incorrect_flags.end());
         }
     }
-    TEST_CASE("Getting location") {
+    TEST_CASE("Getting location" * doctest::skip()) {
         GameLogic::BoardController controller;
         controller.initialize_board(5, 5, 5, 5);
         SUBCASE("Getting an uncovered value") {
@@ -161,7 +164,7 @@ TEST_SUITE("Board controller" * doctest::skip()) {
             }
         }
     }
-    TEST_CASE("Winning game") {
+    TEST_CASE("Winning game" * doctest::skip()) {
         GameLogic::BoardController controller;
         controller.initialize_board(5, 5, 5, 5);
         MESSAGE("Displaying board");
@@ -180,7 +183,7 @@ TEST_SUITE("Board controller" * doctest::skip()) {
         CHECK_THROWS(controller.flag(0, 0));
         CHECK_THROWS(controller.get_changes());
     }
-    TEST_CASE("Losing game") {
+    TEST_CASE("Losing game" * doctest::skip()) {
         GameLogic::BoardController controller;
         controller.initialize_board(5, 5, 5, 5);
         MESSAGE("Displaying board");
