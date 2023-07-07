@@ -28,6 +28,9 @@ namespace GameLogic {
         flag_locations {},
         most_recent_changes {}
         {
+        for (int r = 0; r < h; r++) {
+            visible_map.push_back(std::vector<Cover> (w));
+        }
     }
     int Board::get_width() { return width; }
     int Board::get_height() { return height; }
@@ -163,7 +166,6 @@ namespace GameLogic {
         mine_free_positions.push_back({first_r, first_c});
         for (int r{}; r < height; r++) {
             map.push_back(std::vector<int> (width));
-            visible_map.push_back(std::vector<Cover> (width));
         }
         std::vector<int> positions (width * height);
         
@@ -200,6 +202,7 @@ namespace GameLogic {
      * Output:
      *  a boolean describing whether or not a mine was detonated
     */
+   // NEED TO FIX SO (incorrect) FLAGGED LOCATIONS ARE EXPOSED
     bool Board::select_helper(int r, int c) {
         // allow selection for covered and uncovered locations
         // flagged locations cannot be selected
@@ -257,7 +260,11 @@ namespace GameLogic {
             most_recent_changes.push_back(std::tuple<int, int, int> {zero_pos.first, zero_pos.second, map[zero_pos.first][zero_pos.second]});
             std::vector<std::pair<int, int>> surroundings = get_surrounding_positions(zero_pos.first, zero_pos.second);
             for (auto pos: surroundings) {
-                if (visible_map[pos.first][pos.second] == Cover::Covered) {
+                if (visible_map[pos.first][pos.second] == Cover::Covered || visible_map[pos.first][pos.second] == Cover::Flagged) {
+                    if (visible_map[pos.first][pos.second] == Cover::Flagged) {
+                        flag_count--;
+                        flag_locations.erase(pos.first * width + pos.second);
+                    }
                     visible_map[pos.first][pos.second] = Cover::Uncovered;
                     if (map[pos.first][pos.second] == 0) {
                         zero_poses.push(std::pair<int, int> {pos.first, pos.second});
@@ -289,16 +296,13 @@ namespace GameLogic {
      *      (i.e. if the game has been won)
     */
     bool Board::flag(int r, int c) {
-        if (!started) {
-            return false;
-        }
         switch (visible_map[r][c]) {
             // covered locations may be flagged
             case Cover::Covered:
                 visible_map[r][c] = Cover::Flagged;
                 flag_count++;
                 flag_locations.insert(r * width + c);
-                if (map[r][c] == -1) {
+                if (started && map[r][c] == -1) {
                     correct_flag_count++;
                 }
                 break;
@@ -307,14 +311,14 @@ namespace GameLogic {
                 visible_map[r][c] = Cover::Covered;
                 flag_count--;
                 flag_locations.erase(r * width + c);
-                if (map[r][c] == -1) {
+                if (started && map[r][c] == -1) {
                     correct_flag_count--;
                 }
                 break;
             default:
                 break;
         }
-        done = correct_flag_count == mine_count;
+        done = started && correct_flag_count == mine_count;
         return done;
     }
 }
@@ -338,7 +342,8 @@ TEST_SUITE("Board object") {
         }
         
         SUBCASE("Flagging an unstarted board") {
-            b.flag(0, 0);
+            bool game_won = b.flag(0, 0);
+            CHECK(game_won == false);
             CHECK(b.is_game_started() == false);
         }
 
