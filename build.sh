@@ -3,9 +3,15 @@ while getopts "G:B:T:U:h" flag ; do
         G) GENERATOR="${OPTARG}";;
         B) BUILD_TYPE="${OPTARG}";;
         T) CPPMS_ENABLE_TESTING="${OPTARG}";;
-        U) CPPMS_RUN_UI_TESTS="${OPTARG}";;
-        h) echo "Usage: ./build.sh [-G <Ninja|\"Unix Makefiles\">] [-B <Debug|Release>] [-T <ON|OFF>] [-U <ON|OFF>]" && echo "Make sure you have your desired build generator installed on your system" && exit;;
-        ?) echo "Usage: ./build.sh [-G <Ninja|\"Unix Makefiles\">] [-B <Debug|Release>] [-T <ON|OFF>] [-U <ON|OFF>]" && echo "Make sure you have your desired build generator installed on your system" && exit;;
+        U) CPPMS_RUN_UI_TESTS=ON;;
+        h) echo "Usage: ./build.sh [-G <Ninja|\"Unix Makefiles\">] [-B <Debug|Release>] [-T <ON|OFF>] [-U <ON|OFF>]" \
+            && echo "Make sure you have your desired build generator installed on your system" \
+            && echo "Note that the interactive UI tests will be turned off if testing is turned off" \
+            && exit;;
+        ?) echo "Usage: ./build.sh [-G <Ninja|\"Unix Makefiles\">] [-B <Debug|Release>] [-T <ON|OFF>] [-U <ON|OFF>]" \
+            && echo "Make sure you have your desired build generator installed on your system" \
+            && echo "Note that the interactive UI tests will be turned off if testing is turned off" \
+            && exit;;
     esac
 done
 
