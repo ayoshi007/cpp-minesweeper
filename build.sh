@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# usage message
 usage_msg () {
     cat << EOF
 Usage:
@@ -76,24 +77,25 @@ elif [[ "${CPPMS_ENABLE_TESTING}" = "OFF" ]] ; then
     CPPMS_RUN_UI_TESTS=OFF
 fi
 
-
+# make build subdirectory name
 BUILD_DIR=`echo ${CONFIG} | tr A-Z a-z`
 
-command=(cmake -S . -B build)
-
-# CPPMS_RUN_UI_TESTS not working
+# output options used
 cat << EOF
 === Options ===
 Generator (-g):         ${GENERATOR}
 Configuration (-c):     ${CONFIG}
 Build tests (-t,-nt):   ${CPPMS_ENABLE_TESTING}
 Run UI tests (-ui):     ${CPPMS_RUN_UI_TESTS}
+
 EOF
 
+# configure
 cmake -S . -B build/"${BUILD_DIR}" -G "${GENERATOR}" \
     -DCMAKE_BUILD_TYPE="${CONFIG}" \
     -DCPPMS_ENABLE_TESTING="${CPPMS_ENABLE_TESTING}" \
     -DCPPMS_RUN_UI_TESTS="${CPPMS_RUN_UI_TESTS}" \
     -DFTXUI_BUILD_EXAMPLES=OFF \
     -DFTXUI_BUILD_TESTS=OFF
+# build
 cmake --build build/"${BUILD_DIR}"
