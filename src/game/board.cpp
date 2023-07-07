@@ -189,6 +189,9 @@ namespace GameLogic {
             for (auto pos: surrounding_positions) {
                 map[pos.first][pos.second] = map[pos.first][pos.second] == -1 ? map[pos.first][pos.second] : map[pos.first][pos.second] + 1;
             }
+            if (flag_locations.find(mine_pos) != flag_locations.end()) {
+                correct_flag_count++;
+            }
         }
         started = true;
     }
