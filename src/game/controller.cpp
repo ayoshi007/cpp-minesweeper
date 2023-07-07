@@ -115,9 +115,9 @@ TEST_SUITE("Board controller") {
             }
         }
     }
-    TEST_CASE("Selecting/flagging" * doctest::skip()) {
+    TEST_CASE("Selecting/flagging") {
         GameLogic::BoardController controller;
-        controller.initialize_board(5, 5, 5, 5);
+        controller.initialize_board(8, 8, 10, 5);
         MESSAGE("Displaying board");
         print_map(controller.get_map());
         SUBCASE("Bad select") {
@@ -127,23 +127,23 @@ TEST_SUITE("Board controller") {
             CHECK_THROWS(controller.flag(-1, -1));
         }
         SUBCASE("Selecting after loss") {
-            controller.select(0, 1);
-            bool gameOver = controller.select(2, 0);
+            controller.select(0, 0);
+            bool gameOver = controller.select(1, 2);
             CHECK(gameOver == true);
             CHECK_THROWS(controller.select(0, 0));
         }
         SUBCASE("Flagging after loss") {
-            controller.select(0, 1);
-            controller.select(2, 0);
+            controller.select(0, 0);
+            controller.select(1, 2);
             CHECK_THROWS(controller.flag(0, 0));
         }
         SUBCASE("Incorrect flag counts") {
-            controller.select(0, 1);
-            controller.flag(0, 0);
-            controller.select(2, 0);
+            controller.select(0, 0);
+            controller.flag(0, 2);
+            controller.select(2, 1);
             std::unordered_set<int> incorrect_flags = controller.get_incorrect_flags();
             CHECK(incorrect_flags.size() == 1);
-            CHECK(incorrect_flags.find(0) != incorrect_flags.end());
+            CHECK(incorrect_flags.find(2) != incorrect_flags.end());
         }
     }
     TEST_CASE("Getting location" * doctest::skip()) {
