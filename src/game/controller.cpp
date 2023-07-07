@@ -196,16 +196,16 @@ TEST_SUITE("Board controller") {
         CHECK_THROWS(controller.flag(0, 0));
         CHECK_THROWS(controller.get_changes());
     }
-    TEST_CASE("Losing game" * doctest::skip()) {
+    TEST_CASE("Losing game") {
         GameLogic::BoardController controller;
-        controller.initialize_board(5, 5, 5, 5);
+        controller.initialize_board(8, 8, 10, 5);
         MESSAGE("Displaying board");
         print_map(controller.get_map());
         CHECK_THROWS(controller.get_incorrect_flags());
         CHECK_THROWS(controller.get_mine_locations());
         CHECK_NOTHROW(controller.get_changes());
-        controller.select(0, 1);
-        controller.select(1, 4);
+        controller.select(0, 0);
+        controller.select(1, 2);
         CHECK_NOTHROW(controller.get_incorrect_flags());
         CHECK_NOTHROW(controller.get_mine_locations());
         CHECK_THROWS(controller.select(0, 0));
