@@ -170,11 +170,12 @@ namespace GameLogic {
         // randomly choose the mine locations
         std::iota(positions.begin(), positions.end(), 0);
         std::shuffle(positions.begin(), positions.end(), g);
-        for (int i{}; i < mine_count; i++) {
+        int i{};
+        while ((int)mine_locations.size() < mine_count) {
             int mine_pos = positions[i];
             int r = mine_pos / width;
             int c = mine_pos % width;
-            visible_map[r][c] = Cover::Covered;
+            i++;
             if (std::find(mine_free_positions.begin(), mine_free_positions.end(), std::pair<int, int> {r, c}) != mine_free_positions.end()) {
                 continue;
             }
@@ -187,6 +188,7 @@ namespace GameLogic {
                 map[pos.first][pos.second] = map[pos.first][pos.second] == -1 ? map[pos.first][pos.second] : map[pos.first][pos.second] + 1;
             }
         }
+        started = true;
     }
     /**
      * Selects the cell at row x, column y.
@@ -272,7 +274,6 @@ namespace GameLogic {
         // on the first move, initialize the board
         // the first selected position is guaranteed to be a 0
         if (!started) {
-            started = true;
             set_board(r, c);
         }
         most_recent_changes.clear();
@@ -289,6 +290,9 @@ namespace GameLogic {
      *      (i.e. if the game has been won)
     */
     bool Board::flag(int r, int c) {
+        if (!started) {
+            return false;
+        }
         switch (visible_map[r][c]) {
             // covered locations may be flagged
             case Cover::Covered:
@@ -298,8 +302,6 @@ namespace GameLogic {
                 if (map[r][c] == -1) {
                     correct_flag_count++;
                 }
-                break;
-            case Cover::Uncovered:
                 break;
             // flagged locations may be unflagged
             case Cover::Flagged:
@@ -325,29 +327,46 @@ TEST_SUITE("Board object") {
         CHECK(b.get_height() == 5);
         CHECK(b.get_mine_count() == 10);
     }
-    TEST_CASE("Flagging" * doctest::skip()) {
+    TEST_CASE("Flagging") {
         GameLogic::Board b {8, 8, 10, 5};
         SUBCASE("Flag uncovered position") {
             b.select(0, 0);
             b.flag(0, 0);
+            MESSAGE("Printing map");
+            print_map(b.get_map());
+            CHECK(b.is_game_started() == true);
             CHECK(b.get_visible_map()[0][0] == GameLogic::Board::Cover::Uncovered);
             CHECK(b.get_flag_count() == 0);
             CHECK(b.get_flag_locations().size() == 0);
         }
-        SUBCASE("Flag covered position") {
+        
+        SUBCASE("Flagging an unstarted board") {
             b.flag(0, 0);
-            CHECK(b.get_visible_map()[0][0] == GameLogic::Board::Cover::Flagged);
+            CHECK(b.is_game_started() == false);
+        }
+
+        SUBCASE("Flag covered position") {
+            b.select(0, 0);
+            CHECK(b.is_game_started() == true);
+            b.flag(5, 5);
+            MESSAGE("Printing map");
+            print_map(b.get_state_map());
+            CHECK(b.get_visible_map()[5][5] == GameLogic::Board::Cover::Flagged);
             CHECK(b.get_flag_count() == 1);
             CHECK(b.get_flag_locations().size() == 1);
         }
+        
         SUBCASE("Flag flagged position") {
-            b.flag(0, 0);
-            b.flag(0, 0);
-            CHECK(b.get_visible_map()[0][0] == GameLogic::Board::Cover::Covered);
+            b.select(0, 0);
+            CHECK(b.is_game_started() == true);
+            b.flag(5, 5);
+            b.flag(5, 5);
+            CHECK(b.get_visible_map()[5][5] == GameLogic::Board::Cover::Covered);
             CHECK(b.get_flag_count() == 0);
             CHECK(b.get_flag_locations().size() == 0);
         }
         SUBCASE("Flag all mines") {
+            b.select(0, 0);
             bool allFlagged = false;
             for (int loc: b.get_mine_locations()) {
                 allFlagged = b.flag(loc / b.get_width(), loc % b.get_width());
@@ -358,7 +377,9 @@ TEST_SUITE("Board object") {
             CHECK(b.get_flag_locations().size() == b.get_mine_count());
             if (!allFlagged) {
                 MESSAGE("Displaying board and player board");
+                MESSAGE("Board");
                 print_map(b.get_map());
+                MESSAGE("Player board");
                 print_map(b.get_state_map());
             }
         }
