@@ -161,7 +161,6 @@ namespace GameLogic {
      * first_c - the column of the position to avoid
     */
     void Board::set_board(int first_r, int first_c) {
-        reset_game();
         std::vector<std::pair<int, int>> mine_free_positions = get_surrounding_positions(first_r, first_c);
         mine_free_positions.push_back({first_r, first_c});
         for (int r{}; r < height; r++) {
@@ -194,6 +193,7 @@ namespace GameLogic {
             }
         }
         started = true;
+        done = correct_flag_count == mine_count;
     }
     /**
      * Selects the cell at row x, column y.
@@ -425,7 +425,7 @@ TEST_SUITE("Board object") {
             CHECK(b.get_most_recent_changes().size() == 18);
             const std::vector<std::tuple<int, int, int>> changes = b.get_most_recent_changes();
             for (auto change: changes) {
-                std::cout << std::get<0>(change) << ", " << std::get<1>(change) << " = " << std::get<2>(change) << '\n';
+                //std::cout << std::get<0>(change) << ", " << std::get<1>(change) << " = " << std::get<2>(change) << '\n';
                 CHECK(b.get_visible_map()[std::get<0>(change)][std::get<1>(change)] == GameLogic::Board::Cover::Uncovered);
                 CHECK(b.get_map()[std::get<0>(change)][std::get<1>(change)] == std::get<2>(change));
             }
@@ -478,5 +478,24 @@ TEST_SUITE("Board object") {
             CHECK(b.is_game_lost() == true);
             CHECK(b.is_game_done() == true);
         }
+    }
+
+    TEST_CASE("Instant win") {
+        GameLogic::Board b {8, 8, 10, 5};
+        b.flag(1, 2);
+        b.flag(1, 3);
+        b.flag(2, 1);
+        b.flag(3, 5);
+        b.flag(5, 0);
+        b.flag(5, 5);
+        b.flag(6, 4);
+        b.flag(6, 7);
+        b.flag(7, 1);
+        b.flag(7, 2);
+        b.select(0, 0);
+        MESSAGE("Printing flags");
+        print_map(b.get_state_map());
+        CHECK(b.is_game_done() == true);
+        CHECK(b.get_correct_flag_count() == 10);
     }
 }
