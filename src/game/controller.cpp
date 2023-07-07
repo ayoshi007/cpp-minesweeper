@@ -48,7 +48,7 @@ namespace GameLogic {
         return board.get_flag_count();
     }
     int BoardController::get_value(int x, int y) {
-        if (!board.is_game_done() && board.get_visible_map()[x][y] != Board::Cover::Uncovered) {
+        if (!board.is_game_started() || (!board.is_game_done() && board.get_visible_map()[x][y] != Board::Cover::Uncovered)) {
             throw "Location is not uncovered";
         }
         return board.get_map()[x][y];
@@ -146,18 +146,25 @@ TEST_SUITE("Board controller") {
             CHECK(incorrect_flags.find(2) != incorrect_flags.end());
         }
     }
-    TEST_CASE("Getting location" * doctest::skip()) {
+    TEST_CASE("Getting location") {
         GameLogic::BoardController controller;
-        controller.initialize_board(5, 5, 5, 5);
+        controller.initialize_board(8, 8, 10, 5);
         SUBCASE("Getting an uncovered value") {
             controller.select(0, 0);
-            CHECK(controller.get_value(0, 0) == 1);
+            CHECK(controller.get_value(0, 0) == 0);
+            CHECK(controller.get_value(0, 1) == 1);
+            CHECK(controller.get_value(1, 0) == 1);
+            CHECK(controller.get_value(1, 1) == 2);
         }
-        SUBCASE("Getting a non-uncovered value") {
+        SUBCASE("Attempt at getting a value before start") {
             CHECK_THROWS(controller.get_value(0, 0));
         }
+        SUBCASE("Attempt at getting an uncovered value") {
+            controller.select(0, 0);
+            CHECK_THROWS(controller.get_value(7, 7));
+        }
         SUBCASE("Getting changes after a successful select") {
-            controller.select(4, 0);
+            controller.select(0, 0);
             const std::vector<std::tuple<int, int, int>> changes = controller.get_changes();
             for (auto change: changes) {
                 CHECK_NOTHROW(controller.get_value(std::get<0>(change), std::get<1>(change)));
