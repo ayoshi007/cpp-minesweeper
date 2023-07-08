@@ -7,6 +7,7 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
+#include <ftxui/dom/requirement.hpp>
 #include <ftxui/component/component_base.hpp>
 #include <ftxui/component/component_options.hpp>
 #include <ftxui/dom/canvas.hpp>
@@ -18,9 +19,9 @@
 using namespace ftxui;
 
 namespace GameUI {
-    Color GameBoard::border_color = Color::Blue;
+    Color GameBoard::border_color = Color::GrayDark;
     Color GameBoard::fill_color = Color::DarkBlue;
-    Color GameBoard::flag_color = Color::DarkBlue;
+    Color GameBoard::flag_color = Color::Cyan;
     Color GameBoard::mine_color_detonated = Color::Salmon1;
     Color GameBoard::mine_color_win = Color::Gold1;
 
@@ -50,7 +51,6 @@ namespace GameUI {
         });
     };
     
-
     GameBoard::GameBoard(int w, int h, int mines) : 
         width {w},
         height {h},
@@ -67,7 +67,7 @@ namespace GameUI {
         initialize_cells();
         initialize_renderer();
     }
-    GameBoard::GameBoard(int w, int h, int mines, int seed) : 
+    GameBoard::GameBoard(int w, int h, int mines, int seed) :
         width {w},
         height {h},
         mine_count {mines},
@@ -91,12 +91,12 @@ namespace GameUI {
                 BoardCell cell = {
                     r, c,
                     GameLogic::Board::Cover::Covered,
-                    nullptr
+                    nullptr, nullptr
                 };
                 cell.renderer = Renderer([=] {
                     Canvas cell_canvas = Canvas(canvas_dimension, canvas_dimension);
                     draw_border(cell_canvas, canvas_dimension, GameBoard::border_color);
-
+                    std::cerr << "Rendering cell (" << r << ", " << c << ")\n";
                     if (game_board[r][c].cover == GameLogic::Board::Cover::Mine) {
                         Color mine_color = board_controller.is_game_won() ? GameBoard::mine_color_win : GameBoard::mine_color_detonated;
                         draw_mine(cell_canvas, canvas_dimension, mine_color);
@@ -105,9 +105,77 @@ namespace GameUI {
                     } else if (game_board[r][c].cover == GameLogic::Board::Cover::Uncovered) {
                         draw_number(cell_canvas, canvas_dimension, GameBoard::mine_color_win, board_controller.get_value(r, c));
                     }
-                    //cell_canvas.DrawText(5, 5, std::to_string(game_board[r][c].row) + ", " + std::to_string(game_board[r][c].col));
+                    cell_canvas.DrawText(1, 1, std::to_string(game_board[r][c].row) + ", " + std::to_string(game_board[r][c].col));
                     return canvas(std::move(cell_canvas));
-                });
+                }) | CatchEvent([=] (Event e) {
+                        if (game_is_done) {
+                            return true;
+                        }
+                        if (e.is_mouse()) {
+                            mx = e.mouse().x;
+                            my = e.mouse().y;
+                            
+                            if (e.mouse().motion == Mouse::Released) {
+                                selected_col = cell.col;
+                                selected_row = cell.row;
+                                std::cerr << "Catching event at cell (" << selected_row << ", " << selected_col << ")\n";
+                                if (e.mouse().button == Mouse::Left) {
+                                    game_is_done = board_controller.select(selected_row, selected_col);
+                                    if (!game_is_done) {
+                                        for (auto change: board_controller.get_changes()) {
+                                            game_board[std::get<0>(change)][std::get<1>(change)].cover = GameLogic::Board::Cover::Uncovered;
+                                        }
+                                    } else {
+                                        for (auto mine_loc: board_controller.get_mine_locations()) {
+                                            if (game_board[mine_loc / width][mine_loc % width].cover != GameLogic::Board::Cover::Flagged) {
+                                                game_board[mine_loc / width][mine_loc % width].cover = GameLogic::Board::Cover::Mine;
+                                            }
+                                        }
+                                    }
+                                } else if (e.mouse().button == Mouse::Right) {
+                                    game_is_done = board_controller.flag(selected_row, selected_col);
+                                    game_board[selected_row][selected_col].cover = board_controller.get_cover(selected_row, selected_col);
+                                }
+                            }
+                            return true;
+                        }
+                        return false;
+                    }
+                );
+                cell.event_catcher = [=] (Event e) {
+                    if (game_is_done) {
+                        return true;
+                    }
+                    if (e.is_mouse()) {
+                        mx = e.mouse().x;
+                        my = e.mouse().y;
+                        
+                        if (e.mouse().motion == Mouse::Released) {
+                            selected_col = game_board[r][c].col;
+                            selected_row = game_board[r][c].row;
+                            std::cerr << "Catching event at (" << selected_row << ", " << selected_col << ")\n";
+                            if (e.mouse().button == Mouse::Left) {
+                                game_is_done = board_controller.select(selected_row, selected_col);
+                                if (!game_is_done) {
+                                    for (auto change: board_controller.get_changes()) {
+                                        game_board[std::get<0>(change)][std::get<1>(change)].cover = GameLogic::Board::Cover::Uncovered;
+                                    }
+                                } else {
+                                    for (auto mine_loc: board_controller.get_mine_locations()) {
+                                        if (game_board[mine_loc / width][mine_loc % width].cover != GameLogic::Board::Cover::Flagged) {
+                                            game_board[mine_loc / width][mine_loc % width].cover = GameLogic::Board::Cover::Mine;
+                                        }
+                                    }
+                                }
+                            } else if (e.mouse().button == Mouse::Right) {
+                                game_is_done = board_controller.flag(selected_row, selected_col);
+                                game_board[selected_row][selected_col].cover = board_controller.get_cover(selected_row, selected_col);
+                            }
+                        }
+                        return true;
+                    }
+                    return false;
+                };
                 row.push_back(cell);
             }
             game_board.push_back(row);
@@ -120,77 +188,59 @@ namespace GameUI {
                 container->Add(col.renderer);
             }
         }
-        container |= bgcolor(Color::Black);
         renderer = Renderer(container, [=] {
             std::vector<std::vector<Element>> grid;
             for (int r = 0; r < height; r++) {
                 std::vector<Element> row;
                 for (int c = 0; c < width; c++) {
-                    row.push_back(game_board[r][c].renderer->Render());
+                    row.push_back(container->ChildAt(r * width + c)->Render());
                 }
                 grid.push_back(row);
             }
         
-            return vbox({
-                gridbox(grid),
-                text(std::to_string(mx) + ", " + std::to_string(my)),
-                text(std::to_string(selected_row) + ", " + std::to_string(selected_col))
-            });
-        })
-        | CatchEvent([=] (Event e) {
-            if (game_is_done) {
-                return true;
-            }
-            if (e.is_mouse()) {
-                mx = e.mouse().x;
-                my = e.mouse().y;
-                
-                if (e.mouse().motion == Mouse::Released) {
-                    int col = e.mouse().x / (canvas_dimension / 2);
-                    int row = e.mouse().y / (canvas_dimension / 4);
-                    if (row >= 0 && row < height && col >= 0 && col < width) {
-                        selected_col = col;
-                        selected_row = row;
-                        if (e.mouse().button == Mouse::Left) {
-                            game_is_done = board_controller.select(selected_row, selected_col);
-                            if (!game_is_done) {
-                                for (auto change: board_controller.get_changes()) {
-                                    game_board[std::get<0>(change)][std::get<1>(change)].cover = GameLogic::Board::Cover::Uncovered;
-                                }
-                            } else {
-                                for (auto mine_loc: board_controller.get_mine_locations()) {
-                                    if (game_board[mine_loc / width][mine_loc % width].cover != GameLogic::Board::Cover::Flagged) {
-                                        game_board[mine_loc / width][mine_loc % width].cover = GameLogic::Board::Cover::Mine;
-                                    }
-                                }
-                            }
-                        } else if (e.mouse().button == Mouse::Right) {
-                            game_is_done = board_controller.flag(selected_row, selected_col);
-                            game_board[selected_row][selected_col].cover = board_controller.get_cover(selected_row, selected_col);
-                        }
-                    }
-                }
-                return true;
-            }
-            return false;
+            return gridbox(grid);
         })
         | bgcolor(Color::Black);
     }
-
+    int GameBoard::get_mx() { return mx; }
+    int GameBoard::get_my() { return my; }
+    int GameBoard::get_selected_row() { return selected_row; }
+    int GameBoard::get_selected_col() { return selected_col; }
+    void GameBoard::set_canvas_dimension(int new_dimension) {
+        canvas_dimension = new_dimension;
+    }
     Component GameBoard::get_game_board_renderer() {
         return renderer;
     }
 }
 
-#ifdef RUN_UI_TESTS
+//#ifdef RUN_UI_TESTS
 TEST_SUITE("Game board builder functions") {
     TEST_CASE("Interactive game board test") {
         ScreenInteractive screen = ScreenInteractive::TerminalOutput();
         MESSAGE("Testing game board");
 
-        GameUI::GameBoard gb {16, 16, 40, 5};
-
-        screen.Loop(gb.get_game_board_renderer());
+        GameUI::GameBoard gb {8, 8, 10};
+        auto quit_button = Button("End", screen.ExitLoopClosure(), ButtonOption::Animated());
+        auto button_container = Container::Vertical({
+            quit_button
+        });
+        //std::cout << "Button size: " << button_sizes.min_x << ", " << button_sizes.min_y << '\n';
+        gb.set_canvas_dimension(24);
+        auto gb_renderer = gb.get_game_board_renderer();
+        //Requirement gb_sizes = gb_renderer->Render()->requirement();
+        auto renderer = Container::Vertical({
+            button_container,
+            gb_renderer
+        }) | Renderer([=, &gb] (Element e) {
+            return vbox({
+                e,
+                text("Mouse: " + std::to_string(gb.get_mx()) + ", " + std::to_string(gb.get_my())),
+                text("(r, c): " + std::to_string(gb.get_selected_row()) + ", " + std::to_string(gb.get_selected_col()))
+            });
+        });
+        std::cerr << "=== Start of log ===\n";
+        screen.Loop(renderer);
     }
 }
-#endif
+//#endif
