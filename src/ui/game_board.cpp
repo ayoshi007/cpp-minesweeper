@@ -182,19 +182,21 @@ namespace GameUI {
     }
 }
 
-//#ifdef RUN_UI_TESTS
+#ifdef RUN_UI_TESTS
 TEST_SUITE("Game board builder functions") {
     TEST_CASE("Interactive game board test") {
         ScreenInteractive screen = ScreenInteractive::TerminalOutput();
         MESSAGE("Testing game board");
 
-        GameUI::GameBoard gb {8, 8, 10, 5};
         auto quit_button = Button("End", screen.ExitLoopClosure(), ButtonOption::Animated());
         auto button_container = Container::Vertical({
             quit_button
         });
+
+        GameUI::GameBoard gb {8, 8, 10, 5};
         gb.set_canvas_dimension(12);
         auto gb_renderer = gb.get_game_board_renderer();
+        
         auto renderer = Container::Vertical({
             button_container,
             gb_renderer
@@ -206,9 +208,7 @@ TEST_SUITE("Game board builder functions") {
                 text("(r, c): " + std::to_string(gb.get_selected_row()) + ", " + std::to_string(gb.get_selected_col()))
             });
         });
-        //std::cerr << "=== Start of log ===\n\n";
         screen.Loop(renderer);
-        //std::cerr << "\n=== End of log ===\n";
     }
 }
-//#endif
+#endif

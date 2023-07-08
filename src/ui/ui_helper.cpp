@@ -41,18 +41,27 @@ namespace GameUI {
 
 #ifdef RUN_UI_TESTS
 TEST_SUITE("UI helper functions") {
+    ScreenInteractive screen = ScreenInteractive::TerminalOutput();
+    auto quit_button = Button("End", screen.ExitLoopClosure(), ButtonOption::Animated());
+    auto button_container = Container::Vertical({
+        quit_button
+    });
     TEST_CASE("Build text element") {
-        ScreenInteractive screen = ScreenInteractive::TerminalOutput();
         MESSAGE("Text element builder test");
         Element text_element = GameUI::PartsBuilder::build_text_element("Text element");
-        Component renderer = Renderer([&] () {
-            return text_element;
+
+        auto renderer = Container::Vertical({
+            button_container
         })
-        | border;
+        | Renderer([&] (Element e) {
+            return vbox({
+                e,
+                text_element | border
+            });
+        });
         screen.Loop(renderer);
     }
     TEST_CASE("Build modal prompt") {
-        ScreenInteractive screen = ScreenInteractive::TerminalOutput();
         MESSAGE("Modal prompt builder interactive test");
         bool show_modal = false;
         Component show_modal_button = Button("Show modal", [&show_modal] { show_modal = true; }, ButtonOption::Ascii());
@@ -65,7 +74,6 @@ TEST_SUITE("UI helper functions") {
         screen.Loop(renderer);
     }
     TEST_CASE("Test individual slider label builders") {
-        ScreenInteractive screen = ScreenInteractive::TerminalOutput();
         MESSAGE("Slider builder and label builder interactive test");
         int value = 50;
         int min = 4;
@@ -74,12 +82,23 @@ TEST_SUITE("UI helper functions") {
         std::string label_text = "Value: ";
         Component slider = GameUI::PartsBuilder::build_slider("", &value, min, max, increment);
         Component container = Container::Vertical({slider});
-        Component renderer = Renderer(container, [&] () {
+
+        
+
+        Component slider_renderer = Renderer(container, [&] () {
             return hbox(
                 {GameUI::PartsBuilder::slider_label(label_text, value), slider->Render()}
             );
         })
         | border;
+
+        auto renderer = Container::Vertical({
+            button_container,
+            slider_renderer
+        })
+        | Renderer([&] (Element e) {
+            return e;
+        });
         screen.Loop(renderer);
     }
 }

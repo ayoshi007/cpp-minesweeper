@@ -114,6 +114,12 @@ TEST_SUITE("Main menu builder functions") {
     TEST_CASE("Interactive main menu test") {
         ScreenInteractive screen = ScreenInteractive::TerminalOutput();
         MESSAGE("Testing main menu");
+
+        auto quit_button = Button("End", screen.ExitLoopClosure(), ButtonOption::Animated());
+        auto button_container = Container::Vertical({
+            quit_button
+        });
+
         int width_value = constants::DEFAULT_CUSTOM_W;
         int height_value = constants::DEFAULT_CUSTOM_W;
         int mine_count = constants::SMALL_BOARD_MINES;
@@ -145,9 +151,18 @@ TEST_SUITE("Main menu builder functions") {
                 }
             }
         );
-        screen.Loop(main_menu_renderer);
-        std::string mesg = "W: " + std::to_string(width_value) + ", H: " + std::to_string(height_value) + ", Mines: " + std::to_string(mine_count);
-        MESSAGE(mesg);
+
+        auto renderer = Container::Vertical({
+            button_container,
+            main_menu_renderer
+        })
+        | Renderer([&] (Element e) {
+            return vbox({
+                e,
+                text("W: " + std::to_string(width_value) + ", H: " + std::to_string(height_value) + ", Mines: " + std::to_string(mine_count))
+            });
+        });
+        screen.Loop(renderer);
     }
 }
 #endif
