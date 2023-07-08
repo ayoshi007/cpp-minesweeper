@@ -20,6 +20,7 @@ namespace GameUI {
         int col;
         GameLogic::Board::Cover cover;
         ftxui::Component renderer;
+        std::function<bool(ftxui::Event)> event_catcher;
     };
     
     class GameBoard {
@@ -33,6 +34,7 @@ namespace GameUI {
         int selected_col {};
         bool game_is_done {};
         int canvas_dimension {};
+
         GameLogic::BoardController board_controller;
         std::vector<std::vector<BoardCell>> game_board;
         ftxui::Component container;
@@ -55,6 +57,13 @@ namespace GameUI {
 
         GameBoard(int width, int height, int mine_count);
         GameBoard(int width, int height, int mine_count, int seed);
+
+        int get_mx();
+        int get_my();
+        int get_selected_row();
+        int get_selected_col();
+
+        void set_canvas_dimension(int new_dimension);
         ftxui::Component get_game_board_renderer();
     };
     class GameSideBar {
