@@ -173,10 +173,6 @@ namespace GameUI {
     void GameBoard::set_canvas_dimension(int new_dimension) {
         canvas_dimension = new_dimension;
     }
-    void GameBoard::set_selected_cell(int row, int col) {
-        selected_row = row;
-        selected_col = col;
-    }
     Component GameBoard::get_game_board_renderer() {
         return renderer;
     }
@@ -196,7 +192,7 @@ TEST_SUITE("Game board builder functions") {
         GameUI::GameBoard gb {8, 8, 10, 5};
         gb.set_canvas_dimension(12);
         auto gb_renderer = gb.get_game_board_renderer();
-        
+
         auto renderer = Container::Vertical({
             button_container,
             gb_renderer

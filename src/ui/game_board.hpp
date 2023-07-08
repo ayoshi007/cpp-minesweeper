@@ -64,7 +64,6 @@ namespace GameUI {
         int get_selected_col();
 
         void set_canvas_dimension(int new_dimension);
-        void set_selected_cell(int row, int col);
         ftxui::Component get_game_board_renderer();
     };
     class GameSideBar {
