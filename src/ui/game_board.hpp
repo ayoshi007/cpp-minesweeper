@@ -37,7 +37,6 @@ namespace GameUI {
 
         GameLogic::BoardController board_controller;
         std::vector<std::vector<BoardCell>> game_board;
-        ftxui::Component container;
         ftxui::Component renderer;
 
         static std::function<void(ftxui::Canvas&, int, ftxui::Color)> draw_border;
