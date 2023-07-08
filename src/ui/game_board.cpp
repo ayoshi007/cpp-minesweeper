@@ -198,9 +198,11 @@ namespace GameUI {
                             for (auto mine_loc: board_controller.get_mine_locations()) {
                                 if (game_board[mine_loc / width][mine_loc % width].symbol != CellSymbol::BadFlag
                                     && game_board[mine_loc / width][mine_loc % width].symbol != CellSymbol::Flag) {
-                                    game_board[mine_loc / width][mine_loc % width].symbol = CellSymbol::Detonated;
+                                    game_board[mine_loc / width][mine_loc % width].symbol = CellSymbol::Mine;
                                 }
                             }
+                            std::pair<int, int> detonated_mine = board_controller.get_detonated_mine();
+                            game_board[detonated_mine.first][detonated_mine.second].symbol = CellSymbol::Detonated;
                         }
                     } else if (e.mouse().button == Mouse::Right) {
                         game_is_done = board_controller.flag(selected_row, selected_col);
