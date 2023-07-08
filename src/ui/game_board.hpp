@@ -18,9 +18,9 @@ namespace GameUI {
     struct BoardCell {
         int row;
         int col;
+        bool hovered;
         GameLogic::Board::Cover cover;
         ftxui::Component renderer;
-        std::function<bool(ftxui::Event)> event_catcher;
     };
     
     class GameBoard {
@@ -64,6 +64,7 @@ namespace GameUI {
         int get_selected_col();
 
         void set_canvas_dimension(int new_dimension);
+        void set_selected_cell(int row, int col);
         ftxui::Component get_game_board_renderer();
     };
     class GameSideBar {
