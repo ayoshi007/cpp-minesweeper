@@ -5,8 +5,8 @@ Developed on Ubuntu
 
 This project is a largely pedagogical project for me to practice C++ programming, project design, and test-driven development.
 
-
-The bash scripts are for building in Debug and Release mode.
+The bash script `project_build.sh` is used for building the project with CMake.
+Please note that currently, only GCC and Linux systems are supported.
 
 Subdirectory explanations:
 - app - holds the main file that will become the target executable
