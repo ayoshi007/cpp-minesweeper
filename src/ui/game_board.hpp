@@ -57,6 +57,7 @@ namespace GameUI {
         void initialize_renderer();
         public:
         static ftxui::Color bg_color;
+        static ftxui::Color bad_bg_color;
         static ftxui::Color border_color;
         static ftxui::Color bad_border_color;
 

@@ -20,6 +20,7 @@ using namespace ftxui;
 
 namespace GameUI {
     Color GameBoard::bg_color = Color::Black;
+    Color GameBoard::bad_bg_color = Color::DarkRed;
     Color GameBoard::border_color = Color::GrayDark;
     Color GameBoard::bad_border_color = Color::Red;
 
@@ -132,16 +133,18 @@ namespace GameUI {
                                 draw_flag(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::flag_color);
                                 break;
                             case CellSymbol::BadFlag:
-                                draw_border(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::bad_border_color);
-                                draw_flag(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::bad_flag_color);
+                                fill_cell(cell_canvas, canvas_dimension, GameBoard::bad_bg_color);
+                                draw_border(cell_canvas, canvas_dimension, GameBoard::bad_bg_color, GameBoard::bad_border_color);
+                                draw_flag(cell_canvas, canvas_dimension, GameBoard::bad_bg_color, GameBoard::bad_flag_color);
                                 break;
                             case CellSymbol::Mine:
                                 draw_border(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::bad_border_color);
                                 draw_mine(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::mine_color);
                                 break;
                             case CellSymbol::Detonated:
-                                draw_border(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::bad_border_color);
-                                draw_mine(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::mine_color_detonated);
+                                fill_cell(cell_canvas, canvas_dimension, GameBoard::bad_bg_color);
+                                draw_border(cell_canvas, canvas_dimension, GameBoard::bad_bg_color, GameBoard::bad_border_color);
+                                draw_mine(cell_canvas, canvas_dimension, GameBoard::bad_bg_color, GameBoard::mine_color_detonated);
                                 break;
                         }
                         cell_canvas.DrawText(2, 1, std::to_string(game_board[cell_row][cell_col].row) + ", " + std::to_string(game_board[cell_row][cell_col].col));
