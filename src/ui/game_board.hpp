@@ -62,6 +62,7 @@ namespace GameUI {
         int get_my();
         int get_selected_row();
         int get_selected_col();
+        ftxui::Element get_flag_label();
 
         void set_canvas_dimension(int new_dimension);
         ftxui::Component get_game_board_renderer();

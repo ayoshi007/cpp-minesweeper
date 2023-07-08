@@ -170,6 +170,7 @@ namespace GameUI {
     int GameBoard::get_my() { return my; }
     int GameBoard::get_selected_row() { return selected_row; }
     int GameBoard::get_selected_col() { return selected_col; }
+    Element GameBoard::get_flag_label() { return text(std::to_string(board_controller.get_flag_count()) + "/" + std::to_string(mine_count)); }
     void GameBoard::set_canvas_dimension(int new_dimension) {
         canvas_dimension = new_dimension;
     }
@@ -200,6 +201,7 @@ TEST_SUITE("Game board builder functions") {
         | Renderer([=, &gb] (Element e) {
             return vbox({
                 e,
+                gb.get_flag_label(),
                 text("Mouse: " + std::to_string(gb.get_mx()) + ", " + std::to_string(gb.get_my())),
                 text("(r, c): " + std::to_string(gb.get_selected_row()) + ", " + std::to_string(gb.get_selected_col()))
             });
