@@ -4,7 +4,7 @@
 #include "helper.hpp"
 
 namespace GameLogic {
-    BoardController::BoardController() {
+    BoardController::BoardController() : detonated_mine {-1, -1} {
     }
     bool BoardController::initialize_board(int width, int height, int mine_count, int seed) {
         if (width <= 0 || height <= 0 || mine_count <= 0) {
@@ -33,7 +33,15 @@ namespace GameLogic {
         if (board.is_game_done()) {
             throw "Game is finished";
         }
-        return board.select(x, y);
+        bool game_over = board.select(x, y);
+        if (game_over) {
+            for (auto change: board.get_most_recent_changes()) {
+                if (std::get<2>(change) == -1) {
+                    detonated_mine = {std::get<0>(change), std::get<1>(change)};
+                }
+            }
+        }
+        return game_over;
     }
     bool BoardController::flag(int x, int y) {
         if (x < 0 || x >= board.get_height() || y < 0 || y >= board.get_width()) {
@@ -63,6 +71,12 @@ namespace GameLogic {
             throw "Game is not lost";
         }
         return board.get_mine_locations();
+    }
+    const std::pair<int, int>& BoardController::get_detonated_mine() {
+        if (!board.is_game_lost()) {
+            throw "Game is not lost";
+        }
+        return detonated_mine;
     }
     std::unordered_set<int> BoardController::get_incorrect_flags() {
         if (!board.is_game_lost()) {
@@ -130,6 +144,7 @@ TEST_SUITE("Board controller") {
             controller.select(0, 0);
             bool gameOver = controller.select(1, 2);
             CHECK(gameOver == true);
+            CHECK(controller.get_detonated_mine() == std::pair<int, int> {1, 2});
             CHECK_THROWS(controller.select(0, 0));
         }
         SUBCASE("Flagging after loss") {
@@ -144,6 +159,18 @@ TEST_SUITE("Board controller") {
             std::unordered_set<int> incorrect_flags = controller.get_incorrect_flags();
             CHECK(incorrect_flags.size() == 1);
             CHECK(incorrect_flags.find(2) != incorrect_flags.end());
+            CHECK(controller.get_detonated_mine() == std::pair<int, int> {2, 1});
+            MESSAGE("Printing visible map");
+            print_map(controller.get_state_map());
+        }
+        SUBCASE("Detonated mine from selecting an incorrected flagged number") {
+            controller.select(0, 0);
+            controller.flag(0, 2);
+            controller.select(0, 1);
+            std::unordered_set<int> incorrect_flags = controller.get_incorrect_flags();
+            CHECK(controller.get_detonated_mine() == std::pair<int, int> {1, 2});
+            MESSAGE("Printing visible map");
+            print_map(controller.get_state_map());
         }
     }
     TEST_CASE("Getting location") {
