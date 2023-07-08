@@ -9,6 +9,7 @@ namespace GameLogic {
     */
     class BoardController {
         private:
+        std::pair<int, int> detonated_mine;
         Board board;
 
         public:
@@ -31,8 +32,8 @@ namespace GameLogic {
         bool is_game_won();
         // called in the event of a game over from a select
         const std::unordered_set<int>& get_mine_locations();
+        const std::pair<int, int>& get_detonated_mine();
         std::unordered_set<int> get_incorrect_flags();
-
         // called after a successful select
         const std::vector<std::tuple<int, int, int>>& get_changes();
 
