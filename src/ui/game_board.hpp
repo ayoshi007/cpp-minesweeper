@@ -15,11 +15,19 @@
 // define all components and elements of the game board here
 
 namespace GameUI {
+    enum CellSymbol {
+        Empty,
+        Number,
+        Flag,
+        BadFlag,
+        Mine,
+        Detonated
+    };
     struct BoardCell {
         int row;
         int col;
         bool hovered;
-        GameLogic::Board::Cover cover;
+        GameUI::CellSymbol symbol;
         ftxui::Component renderer;
     };
     
@@ -39,19 +47,23 @@ namespace GameUI {
         std::vector<std::vector<BoardCell>> game_board;
         ftxui::Component renderer;
 
-        static std::function<void(ftxui::Canvas&, int, ftxui::Color)> draw_border;
         static std::function<void(ftxui::Canvas&, int, ftxui::Color)> fill_cell;
-        static std::function<void(ftxui::Canvas&, int, ftxui::Color)> draw_flag;
-        static std::function<void(ftxui::Canvas&, int, ftxui::Color)> draw_mine;
-        static std::function<void(ftxui::Canvas&, int, ftxui::Color, int)> draw_number;
+        static std::function<void(ftxui::Canvas&, int, ftxui::Color, ftxui::Color)> draw_border;
+        static std::function<void(ftxui::Canvas&, int, ftxui::Color, ftxui::Color)> draw_flag;
+        static std::function<void(ftxui::Canvas&, int, ftxui::Color, ftxui::Color)> draw_mine;
+        static std::function<void(ftxui::Canvas&, int, ftxui::Color, ftxui::Color, int)> draw_number;
 
         void initialize_cells();
         void initialize_renderer();
         public:
+        static ftxui::Color bg_color;
         static ftxui::Color border_color;
-        static ftxui::Color fill_color;
+        static ftxui::Color bad_border_color;
+
+        static ftxui::Color number_color;
         static ftxui::Color flag_color;
-        static ftxui::Color mine_color_win;
+        static ftxui::Color bad_flag_color;
+        static ftxui::Color mine_color;
         static ftxui::Color mine_color_detonated;
 
         GameBoard(int width, int height, int mine_count);

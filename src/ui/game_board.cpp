@@ -19,34 +19,57 @@
 using namespace ftxui;
 
 namespace GameUI {
+    Color GameBoard::bg_color = Color::Black;
     Color GameBoard::border_color = Color::GrayDark;
-    Color GameBoard::fill_color = Color::DarkBlue;
-    Color GameBoard::flag_color = Color::Cyan;
-    Color GameBoard::mine_color_detonated = Color::Salmon1;
-    Color GameBoard::mine_color_win = Color::Gold1;
+    Color GameBoard::bad_border_color = Color::Red;
 
-    std::function<void(ftxui::Canvas&, int, ftxui::Color)> GameBoard::draw_border = [] (Canvas& canvas, int dimension, Color color) {
-        canvas.DrawPointLine(0, 0, dimension - 1, 0, color);
-        canvas.DrawPointLine(dimension - 1, 0, dimension - 1, dimension - 1, color);
-        canvas.DrawPointLine(0, 0, 0, dimension - 1, color);
-        canvas.DrawPointLine(0, dimension - 1, dimension - 1, dimension - 1, color);
+    Color GameBoard::number_color = Color::Gold3Bis;
+    Color GameBoard::flag_color = Color::Cyan;
+    Color GameBoard::bad_flag_color = Color::Salmon1;
+    Color GameBoard::mine_color = Color::Gold3Bis;
+    Color GameBoard::mine_color_detonated = Color::Salmon1;
+
+    std::function<void(Canvas&, int, Color)> GameBoard::fill_cell = [] (Canvas& canvas, int dimension, Color color) {
+        for (int r = 0; r < dimension; r++) {
+            for (int c = 0; c < dimension; c++) {
+                canvas.DrawBlock(r, c, true, color);
+            }
+        }
+    };
+    std::function<void(Canvas&, int, Color, Color)> GameBoard::draw_border = [] (Canvas& canvas, int dimension, Color bg, Color color) {
+        canvas.DrawPointLine(0, 0, dimension - 1, 0, [=] (Pixel& p) {
+            p.background_color = bg;
+            p.foreground_color = color;
+        });
+        canvas.DrawPointLine(dimension - 1, 0, dimension - 1, dimension - 1, [=] (Pixel& p) {
+            p.background_color = bg;
+            p.foreground_color = color;
+        });
+        canvas.DrawPointLine(0, 0, 0, dimension - 1, [=] (Pixel& p) {
+            p.background_color = bg;
+            p.foreground_color = color;
+        });
+        canvas.DrawPointLine(0, dimension - 1, dimension - 1, dimension - 1, [=] (Pixel& p) {
+            p.background_color = bg;
+            p.foreground_color = color;
+        });
     };
     
-    std::function<void(ftxui::Canvas&, int, ftxui::Color)> GameBoard::draw_flag = [] (Canvas& canvas, int dimension, Color color) {
+    std::function<void(Canvas&, int, Color, Color)> GameBoard::draw_flag = [] (Canvas& canvas, int dimension, Color bg, Color color) {
         canvas.DrawText(dimension / 2, dimension / 2, "^", [=] (Pixel& p) {
-            p.background_color = color;
-            p.foreground_color = Color::Black;
+            p.background_color = bg;
+            p.foreground_color = color;
         });
     };
-    std::function<void(ftxui::Canvas&, int, ftxui::Color)> GameBoard::draw_mine = [] (Canvas& canvas, int dimension, Color color) {
+    std::function<void(Canvas&, int, Color, Color)> GameBoard::draw_mine = [] (Canvas& canvas, int dimension, Color bg, Color color) {
         canvas.DrawText(dimension / 2, dimension / 2, "*", [=] (Pixel& p) {
-            p.background_color = color;
-            p.foreground_color = Color::Black;
+            p.background_color = bg;
+            p.foreground_color = color;
         });
     };
-    std::function<void(ftxui::Canvas&, int, ftxui::Color, int)> GameBoard::draw_number = [] (Canvas& canvas, int dimension, Color color, int number) {
+    std::function<void(Canvas&, int, Color, Color, int)> GameBoard::draw_number = [] (Canvas& canvas, int dimension, Color bg, Color color, int number) {
         canvas.DrawText(dimension / 2, dimension / 2, std::to_string(number), [=] (Pixel& p) {
-            p.background_color = Color::Black;
+            p.background_color = bg;
             p.foreground_color = color;
         });
     };
@@ -92,17 +115,34 @@ namespace GameUI {
                 game_board[cell_row][cell_col] = {
                     cell_row, cell_col,
                     false,
-                    GameLogic::Board::Cover::Covered,
+                    CellSymbol::Empty,
                     Renderer([cell_row, cell_col, this] {
                         Canvas cell_canvas = Canvas(canvas_dimension, canvas_dimension);
-                        draw_border(cell_canvas, canvas_dimension, GameBoard::border_color);    
-                        if (game_board[cell_row][cell_col].cover == GameLogic::Board::Cover::Mine) {
-                            Color mine_color = board_controller.is_game_won() ? GameBoard::mine_color_win : GameBoard::mine_color_detonated;
-                            draw_mine(cell_canvas, canvas_dimension, mine_color);
-                        } else if (game_board[cell_row][cell_col].cover == GameLogic::Board::Cover::Flagged) {
-                            draw_flag(cell_canvas, canvas_dimension, GameBoard::flag_color);
-                        } else if (game_board[cell_row][cell_col].cover == GameLogic::Board::Cover::Uncovered) {
-                            draw_number(cell_canvas, canvas_dimension, GameBoard::mine_color_win, board_controller.get_value(cell_row, cell_col));
+                        fill_cell(cell_canvas, canvas_dimension, GameBoard::bg_color);
+                        switch (game_board[cell_row][cell_col].symbol) {
+                            case CellSymbol::Empty:
+                                draw_border(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::border_color);
+                                break;
+                            case CellSymbol::Number:
+                                draw_border(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::border_color);
+                                draw_number(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::number_color, board_controller.get_value(cell_row, cell_col));
+                                break;
+                            case CellSymbol::Flag:
+                                draw_border(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::border_color);
+                                draw_flag(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::flag_color);
+                                break;
+                            case CellSymbol::BadFlag:
+                                draw_border(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::bad_border_color);
+                                draw_flag(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::bad_flag_color);
+                                break;
+                            case CellSymbol::Mine:
+                                draw_border(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::bad_border_color);
+                                draw_mine(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::mine_color);
+                                break;
+                            case CellSymbol::Detonated:
+                                draw_border(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::bad_border_color);
+                                draw_mine(cell_canvas, canvas_dimension, GameBoard::bg_color, GameBoard::mine_color_detonated);
+                                break;
                         }
                         cell_canvas.DrawText(2, 1, std::to_string(game_board[cell_row][cell_col].row) + ", " + std::to_string(game_board[cell_row][cell_col].col));
                         return canvas(std::move(cell_canvas));
@@ -129,7 +169,7 @@ namespace GameUI {
         }
         renderer = Container::Vertical(container_vector)
         | Renderer([=] (Element e) {
-            return e;
+            return e | bgcolor(Color::Black);
         })
         | CatchEvent([=] (Event e) {
             if (game_is_done) {
@@ -146,18 +186,22 @@ namespace GameUI {
                         game_is_done = board_controller.select(selected_row, selected_col);
                         if (!game_is_done) {
                             for (auto change: board_controller.get_changes()) {
-                                game_board[std::get<0>(change)][std::get<1>(change)].cover = GameLogic::Board::Cover::Uncovered;
+                                game_board[std::get<0>(change)][std::get<1>(change)].symbol = CellSymbol::Number;
                             }
                         } else {
+                            for (auto incorrect_flag: board_controller.get_incorrect_flags()) {
+                                game_board[incorrect_flag / width][incorrect_flag % width].symbol = CellSymbol::BadFlag;
+                            }
                             for (auto mine_loc: board_controller.get_mine_locations()) {
-                                if (game_board[mine_loc / width][mine_loc % width].cover != GameLogic::Board::Cover::Flagged) {
-                                    game_board[mine_loc / width][mine_loc % width].cover = GameLogic::Board::Cover::Mine;
+                                if (game_board[mine_loc / width][mine_loc % width].symbol != CellSymbol::BadFlag
+                                    && game_board[mine_loc / width][mine_loc % width].symbol != CellSymbol::Flag) {
+                                    game_board[mine_loc / width][mine_loc % width].symbol = CellSymbol::Detonated;
                                 }
                             }
                         }
                     } else if (e.mouse().button == Mouse::Right) {
                         game_is_done = board_controller.flag(selected_row, selected_col);
-                        game_board[selected_row][selected_col].cover = board_controller.get_cover(selected_row, selected_col);
+                        game_board[selected_row][selected_col].symbol = CellSymbol::Flag;
                     }
                 }
             }
@@ -204,7 +248,7 @@ TEST_SUITE("Game board builder functions") {
                 gb.get_flag_label(),
                 text("Mouse: " + std::to_string(gb.get_mx()) + ", " + std::to_string(gb.get_my())),
                 text("(r, c): " + std::to_string(gb.get_selected_row()) + ", " + std::to_string(gb.get_selected_col()))
-            });
+            }) | bgcolor(Color::Black);
         });
         screen.Loop(renderer);
     }
