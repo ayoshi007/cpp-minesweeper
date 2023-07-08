@@ -188,6 +188,7 @@ namespace GameLogic {
             for (auto pos: surrounding_positions) {
                 map[pos.first][pos.second] = map[pos.first][pos.second] == -1 ? map[pos.first][pos.second] : map[pos.first][pos.second] + 1;
             }
+            // check if a flag is already set in the mine position
             if (flag_locations.find(mine_pos) != flag_locations.end()) {
                 correct_flag_count++;
             }
@@ -341,6 +342,7 @@ TEST_SUITE("Board object") {
             CHECK(b.is_game_started() == true);
             CHECK(b.get_visible_map()[0][0] == GameLogic::Board::Cover::Uncovered);
             CHECK(b.get_flag_count() == 0);
+            CHECK(b.get_mine_locations().size() == 10);
             CHECK(b.get_flag_locations().size() == 0);
         }
         
