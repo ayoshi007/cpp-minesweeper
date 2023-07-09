@@ -15,7 +15,6 @@ namespace GameUI {
     int Window::board_height = constants::DEFAULT_CUSTOM_H;
     int Window::board_mine_count = constants::SMALL_BOARD_MINES;
     bool Window::quit_modal_shown = false;
-    int Window::shown_screen = constants::MAIN_MENU_SCREEN;
     ScreenInteractive Window::screen = ScreenInteractive::TerminalOutput();
     Component Window::quit_button = Button(
         "Quit",
@@ -24,7 +23,7 @@ namespace GameUI {
         );
 
     void Window::start() {
-        current_subtitle = MainMenuBuilder::get_subtitle();
+        current_subtitle = constants::MAIN_MENU_SUBTITLE;
         Component quit_modal = PartsBuilder::build_modal_prompt(
             "Quit?",
             Window::screen.ExitLoopClosure(),
@@ -52,6 +51,6 @@ namespace GameUI {
         screen.Loop(main_renderer);
     }
     void Window::show_main_menu() {
-        Window::shown_screen = constants::MAIN_MENU_SCREEN;
+
     }
 }

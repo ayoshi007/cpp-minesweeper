@@ -25,6 +25,7 @@ namespace GameUI {
         );
 
         public:
+        static bool custom_board_menu_shown;
         static int get_width_slider_value();
         static int get_height_slider_value();
         static int get_mine_percent_slider_value();

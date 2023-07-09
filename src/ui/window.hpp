@@ -14,7 +14,6 @@ namespace GameUI {
         static int board_height;
         static int board_mine_count;
         static bool quit_modal_shown;
-        static int shown_screen;
 
         static MainMenuBuilder main_menu_components;
         static GameBoard game_board_components;

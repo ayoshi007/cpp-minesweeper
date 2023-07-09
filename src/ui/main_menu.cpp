@@ -11,6 +11,7 @@
 using namespace ftxui;
 
 namespace GameUI {
+    bool MainMenuBuilder::custom_board_menu_shown = false;
     int MainMenuBuilder::width_slider_value = constants::DEFAULT_CUSTOM_W;
     int MainMenuBuilder::height_slider_value = constants::DEFAULT_CUSTOM_H;
     int MainMenuBuilder::mine_percent_slider_value = constants::DEFAULT_CUSTOM_PERCENT;
