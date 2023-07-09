@@ -43,12 +43,14 @@ namespace GameLogic {
     /**
      * Clears the board's state back to default values
     */
-    void Board::reset_game() {
+    void Board::new_game() {
         flag_count = 0;
         correct_flag_count = 0;
         lost = false;
         done = false;
         started = false;
+        map.clear();
+        mine_locations.clear();
         flag_locations.clear();
         most_recent_changes.clear();
         for (int r = 0; r < (int)visible_map.size(); r++) {

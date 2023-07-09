@@ -67,14 +67,15 @@ namespace GameUI {
         static ftxui::Color mine_color;
         static ftxui::Color mine_color_detonated;
 
-        GameBoard(int width, int height, int mine_count);
-        GameBoard(int width, int height, int mine_count, int seed);
+        GameBoard(int width, int height, int mine_count, int dimension);
+        GameBoard(int width, int height, int mine_count, int dimension, int seed);
 
         int get_mx();
         int get_my();
         int get_selected_row();
         int get_selected_col();
         ftxui::Element get_flag_label();
+        ftxui::Component get_new_game_button();
 
         void set_canvas_dimension(int new_dimension);
         ftxui::Component get_game_board_renderer();
@@ -85,7 +86,6 @@ namespace GameUI {
         public:
         static GameUI::GameBoard build_side_bar(std::function<void()> return_to_menu_action);
     };
-
 }
 
 #endif // GAME_BOARD_HPP

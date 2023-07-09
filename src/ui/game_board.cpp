@@ -8,6 +8,7 @@
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/requirement.hpp>
+#include <ftxui/dom/node.hpp>
 #include <ftxui/component/component_base.hpp>
 #include <ftxui/component/component_options.hpp>
 #include <ftxui/dom/canvas.hpp>
@@ -15,6 +16,8 @@
 #include <functional>
 #include <vector>
 #include <tuple>
+#include <thread>
+#include <chrono>
 
 using namespace ftxui;
 
@@ -75,40 +78,41 @@ namespace GameUI {
         });
     };
     
-    GameBoard::GameBoard(int w, int h, int mines) : 
+    GameBoard::GameBoard(int w, int h, int mines, int dimension) : 
         width {w},
         height {h},
         mine_count {mines},
         mx {},
         my {},
-        selected_row {},
-        selected_col {},
+        selected_row {-1},
+        selected_col {-1},
         game_is_done {false},
         board_controller {}
         {
         board_controller.initialize_board(w, h, mines);
-        canvas_dimension = 12;
+        canvas_dimension = dimension;
         initialize_cells();
         initialize_renderer();
     }
-    GameBoard::GameBoard(int w, int h, int mines, int seed) :
+    GameBoard::GameBoard(int w, int h, int mines, int dimension, int seed) :
         width {w},
         height {h},
         mine_count {mines},
         mx {},
         my {},
-        selected_row {},
-        selected_col {},
+        selected_row {-1},
+        selected_col {-1},
         game_is_done {false},
         board_controller {}
         {
         board_controller.initialize_board(w, h, mines, seed);
-        canvas_dimension = 12;
+        canvas_dimension = dimension;
         initialize_cells();
         initialize_renderer();
     }
     
     void GameBoard::initialize_cells() {
+        game_is_done = false;
         game_board = std::vector<std::vector<BoardCell>> (height);
         for (int cell_row = 0; cell_row < height; cell_row++) {
             game_board[cell_row] = std::vector<BoardCell> (width);
@@ -171,19 +175,30 @@ namespace GameUI {
             container_vector.push_back(Container::Horizontal(row_vector));
         }
         renderer = Container::Vertical(container_vector)
+        | Hoverable([=] (bool is_hovered) {
+            if (!is_hovered) {
+                selected_row = -1;
+                selected_col = -1;
+            }
+        })
         | Renderer([=] (Element e) {
-            return e | bgcolor(Color::Black);
+            return hbox({e, filler()});
         })
         | CatchEvent([=] (Event e) {
             if (game_is_done) {
-                // returning true means that this mouse event is consumed by this event catcher
+                // returning true here means that this mouse event is consumed by this event catcher
                 //  and does not affect any other event catchers
-                return true;
+
+                // note, returning false to allow responsiveness to other Components
+                return false;
             }
             if (e.is_mouse()) {
                 mx = e.mouse().x;
                 my = e.mouse().y;
                 if (e.mouse().motion == Mouse::Released) {
+                    if (selected_col < 0 || selected_row < 0) {
+                        return false;
+                    }
                     //std::cerr << "Catching event at (" << selected_row << ", " << selected_col << ")\n";
                     if (e.mouse().button == Mouse::Left) {
                         game_is_done = board_controller.select(selected_row, selected_col);
@@ -212,17 +227,26 @@ namespace GameUI {
             }
             // returning false means this Mouse event is not consumed by this event catcher
             return false;
-        })
-        | bgcolor(Color::Black);
+        });
     }
     int GameBoard::get_mx() { return mx; }
     int GameBoard::get_my() { return my; }
     int GameBoard::get_selected_row() { return selected_row; }
     int GameBoard::get_selected_col() { return selected_col; }
-    Element GameBoard::get_flag_label() { return text(std::to_string(board_controller.get_flag_count()) + "/" + std::to_string(mine_count)); }
+    Element GameBoard::get_flag_label() {
+        return text(std::to_string(board_controller.get_flag_count()) + "/" + std::to_string(mine_count));
+    }
+    Component GameBoard::get_new_game_button() {
+        return Button("New board", [=]{
+            board_controller.initialize_board(width, height, mine_count);
+            initialize_cells();
+            initialize_renderer();
+        }, ButtonOption::Animated());
+    }
     void GameBoard::set_canvas_dimension(int new_dimension) {
         canvas_dimension = new_dimension;
     }
+
     Component GameBoard::get_game_board_renderer() {
         return renderer;
     }
@@ -231,6 +255,9 @@ namespace GameUI {
 #ifdef RUN_UI_TESTS
 TEST_SUITE("Game board builder functions") {
     TEST_CASE("Interactive game board test") {
+        // note: a this UI test uses FitComponent() rather than TerminalOutput() like the other tests,
+        //  because TerminalOutput() causes the Component containing the cell grid to fill in
+        //  the remaining space
         ScreenInteractive screen = ScreenInteractive::TerminalOutput();
         MESSAGE("Testing game board");
 
@@ -239,13 +266,13 @@ TEST_SUITE("Game board builder functions") {
             quit_button
         });
 
-        GameUI::GameBoard gb {8, 8, 10, 5};
-        gb.set_canvas_dimension(12);
+        GameUI::GameBoard gb {8, 8, 10, 12, 5};
         auto gb_renderer = gb.get_game_board_renderer();
-
+        auto reset_game_button = gb.get_new_game_button();
         auto renderer = Container::Vertical({
             button_container,
-            gb_renderer
+            gb_renderer,
+            reset_game_button
         })
         | Renderer([=, &gb] (Element e) {
             return vbox({
@@ -253,7 +280,7 @@ TEST_SUITE("Game board builder functions") {
                 gb.get_flag_label(),
                 text("Mouse: " + std::to_string(gb.get_mx()) + ", " + std::to_string(gb.get_my())),
                 text("(r, c): " + std::to_string(gb.get_selected_row()) + ", " + std::to_string(gb.get_selected_col()))
-            }) | bgcolor(Color::Black);
+            });
         });
         screen.Loop(renderer);
     }

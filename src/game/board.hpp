@@ -73,7 +73,7 @@ namespace GameLogic {
         int get_flag_count();
         int get_mine_count();
         int get_correct_flag_count();
-        void reset_game();
+        void new_game();
 
         const std::vector<std::vector<int>>& get_map();
         const std::unordered_set<int>& get_mine_locations();
