@@ -24,6 +24,9 @@ namespace constants {
     extern const std::string MED_BOARD_BUTTON_LABEL;
     extern const std::string LARGE_BOARD_BUTTON_LABEL;
     extern const std::string CUSTOM_BOARD_BUTTON_LABEL;
+
+    extern const std::string MAIN_MENU_SUBTITLE;
+    extern const std::string GAME_BOARD_SUBTITLE;
     /*
     extern int smallBoard[SMALL_BOARD_H][SMALL_BOARD_W];
     extern int medBoard[MED_BOARD_H][MED_BOARD_W];

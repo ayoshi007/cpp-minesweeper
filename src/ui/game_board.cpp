@@ -33,8 +33,6 @@ namespace GameUI {
     Color GameBoard::mine_color = Color::Gold3Bis;
     Color GameBoard::mine_color_detonated = Color::Salmon1;
 
-    std::string subtitle {"Flag the mines!"};
-
     std::function<void(Canvas&, int, Color)> GameBoard::fill_cell = [] (Canvas& canvas, int dimension, Color color) {
         for (int r = 0; r < dimension; r++) {
             for (int c = 0; c < dimension; c++) {

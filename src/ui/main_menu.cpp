@@ -11,9 +11,6 @@
 using namespace ftxui;
 
 namespace GameUI {
-    std::string MainMenuBuilder::subtitle = "Main menu";
-    
-    bool MainMenuBuilder::custom_board_menu_shown = false;
     int MainMenuBuilder::width_slider_value = constants::DEFAULT_CUSTOM_W;
     int MainMenuBuilder::height_slider_value = constants::DEFAULT_CUSTOM_H;
     int MainMenuBuilder::mine_percent_slider_value = constants::DEFAULT_CUSTOM_PERCENT;
@@ -88,10 +85,6 @@ namespace GameUI {
                 {large_board_button->Render(), custom_board_button->Render()}
             }) | center | bgcolor(Color::Black);
         });
-    }
-
-    std::string MainMenuBuilder::get_subtitle() {
-        return subtitle;
     }
     Component MainMenuBuilder::build_main_menu_renderer(
         std::function<void()> small_board_action,
