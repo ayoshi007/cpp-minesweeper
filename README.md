@@ -1,12 +1,9 @@
 # C++ TUI Minesweeper
-### A TUI (FTXUI) Minesweeper program made with C++
-
+### A TUI Minesweeper program  
 This project is a largely pedagogical project for me to practice C++ programming, project design, and test-driven development.
-
 ### Libraries used:  
 - [FTXUI](https://github.com/ArthurSonzogni/FTXUI)
 - [doctest](https://github.com/doctest/doctest)
-
 ### Building and Running
 The bash script `project_build.sh` is used for building the project with CMake.  
 **Note: only GCC and Linux systems are supported at this time**
