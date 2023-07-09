@@ -77,7 +77,6 @@ namespace GameUI {
             p.foreground_color = color;
         });
     };
-    
     GameBoard::GameBoard(int w, int h, int mines, int dimension) : 
         width {w},
         height {h},
@@ -151,7 +150,7 @@ namespace GameUI {
                                 draw_mine(cell_canvas, canvas_dimension, GameBoard::bad_bg_color, GameBoard::mine_color_detonated);
                                 break;
                         }
-                        cell_canvas.DrawText(2, 1, std::to_string(game_board[cell_row][cell_col].row) + ", " + std::to_string(game_board[cell_row][cell_col].col));
+                        //cell_canvas.DrawText(2, 1, std::to_string(game_board[cell_row][cell_col].row) + ", " + std::to_string(game_board[cell_row][cell_col].col));
                         return canvas(std::move(cell_canvas));
                     })
                     | Hoverable([cell_row, cell_col, this] (bool is_hovered) {

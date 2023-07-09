@@ -41,18 +41,21 @@ namespace GameUI {
         | Renderer([=] (Element components) {
             (void)components;
             return vbox({
-                text("Create custom board"),
-                separator(),
-                gridbox({
-                    {GameUI::PartsBuilder::slider_label("Width: ", MainMenuBuilder::width_slider_value), width_slider->Render()},
-                    {GameUI::PartsBuilder::slider_label("Height: ", MainMenuBuilder::height_slider_value), height_slider->Render()},
-                    {GameUI::PartsBuilder::slider_label("Mine %: ", MainMenuBuilder::mine_percent_slider_value), mine_percent_slider_slider->Render()}
-                }) | xflex,
-                separator(),
-                custom_board_start->Render(),
-                custom_board_quit->Render()
-            })
-            | border | bgcolor(Color::Black);// | size(WIDTH, GREATER_THAN, screen.dimx() / 5);
+                filler(),
+                vbox({
+                    text("Create custom board"),
+                    separator(),
+                    gridbox({
+                        {GameUI::PartsBuilder::slider_label("Width: ", MainMenuBuilder::width_slider_value), width_slider->Render()},
+                        {GameUI::PartsBuilder::slider_label("Height: ", MainMenuBuilder::height_slider_value), height_slider->Render()},
+                        {GameUI::PartsBuilder::slider_label("Mine %: ", MainMenuBuilder::mine_percent_slider_value), mine_percent_slider_slider->Render()}
+                    }) | xflex,
+                    separator(),
+                    custom_board_start->Render(),
+                    custom_board_quit->Render()
+                }) | border,
+                filler()
+            }) | bgcolor(Color::Black);// | size(WIDTH, GREATER_THAN, screen.dimx() / 5);
         });
     }
     /**
@@ -81,10 +84,13 @@ namespace GameUI {
         })
         | Renderer([=](Element buttons) {
             (void)buttons;
-            return gridbox({
-                {small_board_button->Render(), med_board_button->Render()},
-                {large_board_button->Render(), custom_board_button->Render()}
-            }) | center | bgcolor(Color::Black);
+            return vbox({
+                filler(),
+                gridbox({
+                    {small_board_button->Render(), med_board_button->Render()},
+                    {large_board_button->Render(), custom_board_button->Render()}
+                })
+            }) | flex | center | bgcolor(Color::Black);
         });
     }
     Component MainMenuBuilder::build_main_menu_renderer(

@@ -12,6 +12,8 @@
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/canvas.hpp>
 
+#include <memory>
+
 // define all components and elements of the game board here
 
 namespace GameUI {
@@ -68,6 +70,7 @@ namespace GameUI {
         void initialize_renderer();
 
         public:
+        GameBoard();
         GameBoard(int width, int height, int mine_count, int dimension);
         GameBoard(int width, int height, int mine_count, int dimension, int seed);
 

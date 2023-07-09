@@ -19,6 +19,7 @@ namespace constants {
     extern const std::string LARGE_BOARD_BUTTON_LABEL {"Large board (30x16, 99 mines)"};
     extern const std::string CUSTOM_BOARD_BUTTON_LABEL {"Custom board"};
 
+    extern const std::string WINDOW_TITLE {"TUI Minesweeper"};
     extern const std::string MAIN_MENU_SUBTITLE {"Main menu"};
     extern const std::string GAME_BOARD_SUBTITLE {"Flag the mines!"};
     /*

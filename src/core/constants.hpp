@@ -25,6 +25,7 @@ namespace constants {
     extern const std::string LARGE_BOARD_BUTTON_LABEL;
     extern const std::string CUSTOM_BOARD_BUTTON_LABEL;
 
+    extern const std::string WINDOW_TITLE;
     extern const std::string MAIN_MENU_SUBTITLE;
     extern const std::string GAME_BOARD_SUBTITLE;
     /*
