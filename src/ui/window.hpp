@@ -27,6 +27,7 @@ namespace GameUI {
         public:
            static void start();
            static void show_main_menu();
+           static void show_game(int w, int h, int mine_count);
     };
 }
 
