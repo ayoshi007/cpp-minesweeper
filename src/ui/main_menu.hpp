@@ -6,21 +6,36 @@
 
 
 namespace GameUI {
-    class MainMenu {
+    class MainMenuBuilder {
         private:
-        static std::string subtitle;
+        static std::function<void()> small_board_button_action;
+        static std::function<void()> med_board_button_action;
+        static std::function<void()> large_board_button_action;
+        static std::function<void()> custom_board_button_action;
 
-        bool custom_board_menu_shown;
-        int width_slider_value;
-        int height_slider_value;
-        int mine_percent_slider_value;
- 
+        static int width_slider_value;
+        static int height_slider_value;
+        static int mine_percent_slider_value;
+
+        static ftxui::Component build_custom_board_modal(std::function<void()> custom_board_action);
+        static ftxui::Component build_main_menu_buttons(
+            std::function<void()> small_board_action,
+            std::function<void()> med_board_action,
+            std::function<void()> large_board_action
+        );
+
         public:
-        static std::string get_subtitle();
+        static bool custom_board_menu_shown;
+        static int get_width_slider_value();
+        static int get_height_slider_value();
+        static int get_mine_percent_slider_value();
 
-        MainMenu();
-        // Component build_main_menu_renderer(const std::string& label, std::function<void()> action);
-        // Component build_slider_and_label(int value)
+        static ftxui::Component build_main_menu_renderer(
+            std::function<void()> small_board_action,
+            std::function<void()> med_board_action,
+            std::function<void()> large_board_action,
+            std::function<void()> custom_board_action
+        );
     };
 }
 

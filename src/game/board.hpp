@@ -1,11 +1,13 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
+#include <iostream>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
 #include <tuple>
-#include <utility>
+#include <queue>
+#include <string>
+#include <numeric>
 #include <algorithm>
 #include <random>
 
@@ -24,14 +26,15 @@ namespace GameLogic {
         enum Cover {
             Covered,
             Uncovered,
-            Flagged
+            Flagged,
+            Mine
         };
         private:
-        int width;
+        int width {};
         int height {};
         int mine_count {};
-        int flags {};
-        int correct_flags {};
+        int flag_count {};
+        int correct_flag_count {};
         bool lost {};
         bool done {};
         bool started {};
@@ -42,16 +45,19 @@ namespace GameLogic {
         std::vector<std::vector<int>> map {};
         std::vector<std::vector<Cover>> visible_map {};
         std::unordered_set<int> mine_locations {};
-        std::vector<std::pair<int, int>> flag_locations {};
+        std::unordered_set<int> flag_locations {};
+        std::vector<std::tuple<int, int, int>> most_recent_changes {};
 
         // returns all surrounding coordinates to the input position
         const std::vector<std::pair<int, int>> get_surrounding_positions(int x, int y);
         // returns the number of each Cover given a vector of positions
         std::unordered_map<Cover, int> get_visibilities(const std::vector<std::pair<int, int>>& surrounding_positions);
-        // helper function for select
-        bool uncover_surroundings(int x, int y);
-        // randomly finds an unmined position
-        std::pair<int, int> find_free_pos();
+
+        // initializes board upon first select
+        void set_board(int first_r, int first_c);
+        // helper functions for select()
+        bool select_helper(int x, int y);
+        void uncover_zero_poses(std::queue<std::pair<int, int>>& zero_poses);
 
         public:
         // seeded constructors are included for testability
@@ -66,14 +72,15 @@ namespace GameLogic {
         bool is_game_started();
         int get_flag_count();
         int get_mine_count();
-        int get_correct_flags();
-        void clear_board();
-        void set_board(int w, int h, int mines);
-                
+        int get_correct_flag_count();
+        void new_game();
+
         const std::vector<std::vector<int>>& get_map();
         const std::unordered_set<int>& get_mine_locations();
+        const std::unordered_set<int>& get_flag_locations();
         const std::vector<std::vector<Cover>>& get_visible_map();
         const std::vector<std::vector<std::string>> get_state_map();
+        const std::vector<std::tuple<int, int, int>>& get_most_recent_changes();
         
         bool select(int x, int y);
         bool flag(int x, int y);

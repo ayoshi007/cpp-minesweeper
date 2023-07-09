@@ -2,16 +2,20 @@
 #define UI_HELPER_HPP
 
 #include <functional>
+#include <vector>
+#include <string>
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
 
 
 namespace GameUI {
-    class ModalPromptBuilder {
+    class PartsBuilder {
         public:
-        static ftxui::Component build(const std::string& prompt, std::function<void()> yes_op, std::function<void()> no_op);
+        static ftxui::Component build_modal_prompt(const std::string& prompt, std::function<void()> yes_op, std::function<void()> no_op);
+        static ftxui::Element build_text_element(const std::string& str);
+        static std::function<ftxui::Element(std::string, int)> slider_label;
+        static ftxui::Component build_slider(std::string label_text, int* value, int min, int max, int increment);
     };
-    ftxui::Element build_text_element(const std::string& str);
 }
 
-#endif // UI_HELPER_HPP
+    #endif // UI_HELPER_HPP

@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
+#include <string>
+
 namespace constants {
     extern const int SMALL_BOARD_W;
     extern const int SMALL_BOARD_H;
@@ -17,6 +19,15 @@ namespace constants {
 
     extern const int MAIN_MENU_SCREEN;
     extern const int GAME_BOARD_SCREEN;
+
+    extern const std::string SMALL_BOARD_BUTTON_LABEL;
+    extern const std::string MED_BOARD_BUTTON_LABEL;
+    extern const std::string LARGE_BOARD_BUTTON_LABEL;
+    extern const std::string CUSTOM_BOARD_BUTTON_LABEL;
+
+    extern const std::string WINDOW_TITLE;
+    extern const std::string MAIN_MENU_SUBTITLE;
+    extern const std::string GAME_BOARD_SUBTITLE;
     /*
     extern int smallBoard[SMALL_BOARD_H][SMALL_BOARD_W];
     extern int medBoard[MED_BOARD_H][MED_BOARD_W];
