@@ -224,7 +224,12 @@ namespace GameUI {
                         }
                     } else if (e.mouse().button == Mouse::Right) {
                         game_is_done = board_controller.flag(selected_row, selected_col);
-                        game_board[selected_row][selected_col].symbol = CellSymbol::Flag;
+                        if (board_controller.get_cover(selected_row, selected_col) == GameLogic::Board::Cover::Flagged) {
+                            game_board[selected_row][selected_col].symbol = CellSymbol::Flag;
+                        } else if (board_controller.get_cover(selected_row, selected_col) == GameLogic::Board::Cover::Covered) {
+                            game_board[selected_row][selected_col].symbol = CellSymbol::Empty;
+                        }
+                        
                     }
                 }
             }
