@@ -80,12 +80,6 @@ namespace GameUI {
         void set_canvas_dimension(int new_dimension);
         ftxui::Component get_game_board_renderer();
     };
-    class GameSideBar {
-        private:
-
-        public:
-        static GameUI::GameBoard build_side_bar(std::function<void()> return_to_menu_action);
-    };
 }
 
 #endif // GAME_BOARD_HPP
