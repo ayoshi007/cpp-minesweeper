@@ -28,6 +28,7 @@ namespace GameUI {
     Color GameBoard::bad_border_color = Color::Red;
 
     Color GameBoard::number_color = Color::Gold3Bis;
+    Color GameBoard::zero_color = Color::GrayDark;
     Color GameBoard::flag_color = Color::Cyan;
     Color GameBoard::bad_flag_color = Color::Salmon1;
     Color GameBoard::mine_color = Color::Gold3Bis;
@@ -72,6 +73,9 @@ namespace GameUI {
         });
     };
     std::function<void(Canvas&, int, Color, Color, int)> GameBoard::draw_number = [] (Canvas& canvas, int dimension, Color bg, Color color, int number) {
+        if (number == 0) {
+            color = GameBoard::zero_color;
+        }
         canvas.DrawText(dimension / 2, dimension / 2, std::to_string(number), [=] (Pixel& p) {
             p.background_color = bg;
             p.foreground_color = color;

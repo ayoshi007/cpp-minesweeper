@@ -55,6 +55,7 @@ namespace GameUI {
         static ftxui::Color bad_border_color;
 
         static ftxui::Color number_color;
+        static ftxui::Color zero_color;
         static ftxui::Color flag_color;
         static ftxui::Color bad_flag_color;
         static ftxui::Color mine_color;
