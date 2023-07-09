@@ -47,15 +47,6 @@ namespace GameUI {
         std::vector<std::vector<BoardCell>> game_board;
         ftxui::Component renderer;
 
-        static std::function<void(ftxui::Canvas&, int, ftxui::Color)> fill_cell;
-        static std::function<void(ftxui::Canvas&, int, ftxui::Color, ftxui::Color)> draw_border;
-        static std::function<void(ftxui::Canvas&, int, ftxui::Color, ftxui::Color)> draw_flag;
-        static std::function<void(ftxui::Canvas&, int, ftxui::Color, ftxui::Color)> draw_mine;
-        static std::function<void(ftxui::Canvas&, int, ftxui::Color, ftxui::Color, int)> draw_number;
-
-        void initialize_cells();
-        void initialize_renderer();
-        public:
         static ftxui::Color bg_color;
         static ftxui::Color bad_bg_color;
         static ftxui::Color border_color;
@@ -67,6 +58,16 @@ namespace GameUI {
         static ftxui::Color mine_color;
         static ftxui::Color mine_color_detonated;
 
+        static std::function<void(ftxui::Canvas&, int, ftxui::Color)> fill_cell;
+        static std::function<void(ftxui::Canvas&, int, ftxui::Color, ftxui::Color)> draw_border;
+        static std::function<void(ftxui::Canvas&, int, ftxui::Color, ftxui::Color)> draw_flag;
+        static std::function<void(ftxui::Canvas&, int, ftxui::Color, ftxui::Color)> draw_mine;
+        static std::function<void(ftxui::Canvas&, int, ftxui::Color, ftxui::Color, int)> draw_number;
+
+        void initialize_cells();
+        void initialize_renderer();
+
+        public:
         GameBoard(int width, int height, int mine_count, int dimension);
         GameBoard(int width, int height, int mine_count, int dimension, int seed);
 
