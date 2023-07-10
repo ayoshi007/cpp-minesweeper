@@ -2,9 +2,6 @@
 #include <doctest/doctest.h>
 
 #include <core/starter.hpp>
-#include <ui/window.hpp>
-
-#include <iostream>
 
 /*
 Driver class
